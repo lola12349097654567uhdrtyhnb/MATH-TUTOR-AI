@@ -1,0 +1,19 @@
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import dbConnect from '@/lib/mongodb';
+import User from '@/lib/models/User';
+
+export async function GET() {
+  try {
+    const sessionUser = (await cookies()).get('session_user')?.value;
+    if (!sessionUser) return NextResponse.json({ role: null, username: null });
+
+    await dbConnect();
+    const user = await User.findOne({ username: sessionUser });
+    if (!user) return NextResponse.json({ role: null, username: null });
+
+    return NextResponse.json({ role: user.role, username: user.username });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

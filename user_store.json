@@ -1,0 +1,1310 @@
+{
+  "gamal": {
+    "password_hash": "scrypt:32768:8:1$NhIf6TkvvK4ddnmE$07094329b41d0331ce53f02525956a54a91587b86c0625027e3419dfbe8c54e4457a90651e1373dcb3b535626b4801443f23a9c00bd558a2ed55459cedec51b1",
+    "profile_configured": true,
+    "diagnostic_index": 3,
+    "diagnostic_correct": 2,
+    "diagnostic_time_sum": 22.0,
+    "diagnostic_completed": true,
+    "topic_intro_seen_fractions": true,
+    "current_action": {
+      "type": "question",
+      "id": "q_master_73",
+      "content": "What is 2/4 \u00f7 2/6?",
+      "options": [
+        "11/8",
+        "12/9",
+        "12/8",
+        "13/8"
+      ],
+      "difficulty": "master",
+      "subject": "fractions"
+    },
+    "hint_used_current_action": true,
+    "hint_count_current_action": 1,
+    "attempt_count_current_action": 1,
+    "seen_questions_fractions": [
+      "q_medium_31",
+      "q_master_67",
+      "q_master_66",
+      "q_master_73"
+    ],
+    "activity": [
+      {
+        "ts": "2026-04-07T17:17:50+00:00",
+        "type": "profile_configured",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-07T17:18:12+00:00",
+        "type": "diagnostic_completed",
+        "details": {
+          "topic": "fractions",
+          "correct": 2,
+          "total": 3,
+          "avg_time_s": 7.33,
+          "starting_mastery": 0.63
+        }
+      },
+      {
+        "ts": "2026-04-07T17:18:15+00:00",
+        "type": "topic_video_seen",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-07T17:18:25+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_31",
+          "correct": true,
+          "time_s": 10,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.9,
+          "next_question_id": "q_master_67"
+        }
+      },
+      {
+        "ts": "2026-04-07T17:18:38+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_67",
+          "correct": true,
+          "time_s": 13,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_66"
+        }
+      },
+      {
+        "ts": "2026-04-07T17:18:46+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_66",
+          "correct": true,
+          "time_s": 8,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_73"
+        }
+      },
+      {
+        "ts": "2026-04-07T17:18:51+00:00",
+        "type": "hint_requested",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_73",
+          "hint_style": "step_by_step",
+          "hint_mode": "text"
+        }
+      }
+    ],
+    "brain_state": {
+      "belief": 0.99,
+      "p_guess": 0.2,
+      "p_slip": 0.13,
+      "p_transit": 0.1,
+      "mastery_bias": -0.05,
+      "learning_profile": {
+        "preferred_method": "step_by_step",
+        "pacing": "balanced",
+        "confidence": "low",
+        "support_level": "moderate",
+        "hint_style": "visual"
+      },
+      "diagnostic_questions": [
+        {
+          "id": "diag_fractions_1",
+          "content": "What is 1/2 + 1/2?",
+          "options": [
+            "1",
+            "2/4",
+            "3/4",
+            "1/4"
+          ],
+          "correct_answer": "1"
+        },
+        {
+          "id": "diag_fractions_2",
+          "content": "What is 2/3 + 1/3?",
+          "options": [
+            "1",
+            "3/6",
+            "4/3",
+            "1/3"
+          ],
+          "correct_answer": "1"
+        },
+        {
+          "id": "diag_fractions_3",
+          "content": "What is 3/4 - 1/4?",
+          "options": [
+            "1/2",
+            "2/8",
+            "1",
+            "0"
+          ],
+          "correct_answer": "1/2"
+        }
+      ]
+    }
+  },
+  "haneen": {
+    "password_hash": "scrypt:32768:8:1$6U0tO2o1vsUjMDgL$4558ee235398e5c6a908164e396ac0ed7bfa4c19c3bddc1bea7f817557079ddcfbf905d092c728d39f16342c07f16efe4652db5047b897c40370f797ddb4289d",
+    "profile_configured": true,
+    "diagnostic_index": 1,
+    "diagnostic_correct": 1,
+    "diagnostic_time_sum": 20.0,
+    "diagnostic_completed": true,
+    "topic_intro_seen_fractions": true,
+    "current_action": {
+      "type": "question",
+      "id": "q_master_65",
+      "content": "What is 1/4 \u00f7 1/3?",
+      "options": [
+        "2/4",
+        "3/5",
+        "4/4",
+        "3/4"
+      ],
+      "difficulty": "master",
+      "subject": "fractions"
+    },
+    "hint_used_current_action": false,
+    "hint_count_current_action": 0,
+    "attempt_count_current_action": 1,
+    "seen_questions_fractions": [
+      "q_easy_19",
+      "q_medium_33",
+      "q_hard_47",
+      "q_master_65"
+    ],
+    "activity": [
+      {
+        "ts": "2026-04-07T18:59:42+00:00",
+        "type": "profile_configured",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-07T19:00:02+00:00",
+        "type": "diagnostic_completed",
+        "details": {
+          "topic": "fractions",
+          "correct": 1,
+          "total": 1,
+          "avg_time_s": 20.0,
+          "starting_mastery": 0.25
+        }
+      },
+      {
+        "ts": "2026-04-07T19:00:06+00:00",
+        "type": "topic_video_seen",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-07T19:00:14+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_easy_19",
+          "correct": true,
+          "time_s": 8,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.64,
+          "next_question_id": "q_medium_33"
+        }
+      },
+      {
+        "ts": "2026-04-07T19:00:33+00:00",
+        "type": "hint_requested",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_33",
+          "hint_style": "real_world",
+          "hint_mode": "text"
+        }
+      },
+      {
+        "ts": "2026-04-07T19:01:07+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_33",
+          "correct": true,
+          "time_s": 53,
+          "hint_used": true,
+          "attempt": 1,
+          "mastery": 0.85,
+          "next_question_id": "q_hard_47"
+        }
+      },
+      {
+        "ts": "2026-04-07T19:01:20+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_hard_47",
+          "correct": true,
+          "time_s": 13,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.98,
+          "next_question_id": "q_master_65"
+        }
+      }
+    ],
+    "brain_state": {
+      "belief": 0.9754559368485048,
+      "p_guess": 0.2,
+      "p_slip": 0.11,
+      "p_transit": 0.08,
+      "mastery_bias": -0.05,
+      "learning_profile": {
+        "preferred_method": "step_by_step",
+        "pacing": "slow",
+        "confidence": "low",
+        "support_level": "high",
+        "hint_style": "real_world"
+      },
+      "diagnostic_questions": [
+        {
+          "id": "q_easy_0",
+          "content": "What is 4/8 + 1/8?",
+          "options": [
+            "6/8",
+            "4/8",
+            "5/8",
+            "5/16"
+          ],
+          "correct_answer": "5/8",
+          "difficulty": "easy",
+          "subject": "fractions",
+          "hints": {
+            "step_by_step": "Since the denominators are the same (8), just add the numerators: 4 + 1.",
+            "real_world": "If you have a pizza cut into 8 slices, and you eat 4 slices and then another 1 slices, you've eaten 5 slices.",
+            "visual": "Imagine two visual bars both split into 8 pieces. Highlighting 4 pieces on the first and 1 on the second combines to 5 total pieces out of 8."
+          },
+          "visual_data": {
+            "left": {
+              "numerator": 4,
+              "denominator": 8
+            },
+            "right": {
+              "numerator": 1,
+              "denominator": 8
+            }
+          }
+        }
+      ]
+    }
+  },
+  "lola": {
+    "password_hash": "scrypt:32768:8:1$XGUtPIuwk2UX5mYI$25e2173cde53d84d1dc2ef1604c59080b9ed83b6f9d0e32531254be0e906226610e85e43418146ced9db7f4693df4aaa4dba6f11cc6bcee606ddd3be820cb221",
+    "profile_configured": true,
+    "diagnostic_index": 1,
+    "diagnostic_correct": 0,
+    "diagnostic_time_sum": 8.0,
+    "diagnostic_completed": true,
+    "topic_intro_seen_fractions": true,
+    "current_action": {
+      "type": "question",
+      "id": "q_master_65",
+      "content": "What is 1/4 \u00f7 1/3?",
+      "options": [
+        "2/4",
+        "3/5",
+        "4/4",
+        "3/4"
+      ],
+      "difficulty": "master",
+      "subject": "fractions"
+    },
+    "hint_used_current_action": false,
+    "hint_count_current_action": 0,
+    "attempt_count_current_action": 1,
+    "questions_since_last_upload_fractions": 0,
+    "seen_questions_fractions": [
+      "q_easy_1",
+      "q_medium_24",
+      "q_hard_50",
+      "q_master_75",
+      "q_master_60",
+      "q_master_73",
+      "q_master_61",
+      "q_master_76",
+      "q_master_62",
+      "q_master_63",
+      "q_master_67",
+      "q_master_71",
+      "q_master_64"
+    ],
+    "activity": [
+      {
+        "ts": "2026-04-08T16:13:40+00:00",
+        "type": "profile_configured",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-08T16:13:48+00:00",
+        "type": "diagnostic_completed",
+        "details": {
+          "topic": "fractions",
+          "correct": 0,
+          "total": 1,
+          "avg_time_s": 8.0,
+          "starting_mastery": 0.15
+        }
+      },
+      {
+        "ts": "2026-04-08T16:13:50+00:00",
+        "type": "topic_video_seen",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-08T16:13:56+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_easy_1",
+          "correct": true,
+          "time_s": 6,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.52,
+          "next_question_id": "q_medium_24"
+        }
+      },
+      {
+        "ts": "2026-04-08T16:14:14+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_24",
+          "correct": true,
+          "time_s": 17,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.85,
+          "next_question_id": "q_hard_50"
+        }
+      },
+      {
+        "ts": "2026-04-08T16:14:28+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_hard_50",
+          "correct": true,
+          "time_s": 13,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_75"
+        }
+      },
+      {
+        "ts": "2026-04-08T16:14:34+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_75",
+          "correct": true,
+          "time_s": 5,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_60"
+        }
+      },
+      {
+        "ts": "2026-04-08T16:14:50+00:00",
+        "type": "hint_requested",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_60",
+          "hint_style": "step_by_step",
+          "hint_mode": "text"
+        }
+      },
+      {
+        "ts": "2026-04-08T16:15:03+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_60",
+          "correct": false,
+          "time_s": 28,
+          "hint_used": true,
+          "attempt": 1,
+          "mastery": 0.93,
+          "next_question_id": "q_master_60"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:44:00+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_60",
+          "correct": true,
+          "time_s": 9,
+          "hint_used": true,
+          "attempt": 2,
+          "mastery": 0.95,
+          "next_question_id": null
+        }
+      },
+      {
+        "ts": "2026-04-09T11:46:45+00:00",
+        "type": "upload_rejected",
+        "details": {
+          "mastery_penalty": "-0.15",
+          "file": "static\\uploads\\1563da68-5c9b-48ea-947f-a8e768c32f57_WhatsApp Image 2026-04-09 at 1.46.04 PM.jpeg"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:47:41+00:00",
+        "type": "upload_rejected",
+        "details": {
+          "mastery_penalty": "-0.15",
+          "file": "static\\uploads\\96c273dc-faa3-49aa-9755-dd70d518b718_WhatsApp Image 2026-04-09 at 1.47.14 PM.jpeg"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:53:18+00:00",
+        "type": "upload_rejected",
+        "details": {
+          "mastery_penalty": "-0.15",
+          "file": "static\\uploads\\2d320f77-55a2-4077-9abe-7ef3f53e8cf5_WhatsApp Image 2026-04-09 at 1.53.02 PM.jpeg"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:56:58+00:00",
+        "type": "upload_accepted",
+        "details": {
+          "mastery_boost": "+0.10",
+          "file": "static\\uploads\\af3b3a24-acb8-4d4e-b7ed-e5286ed0f25d_WhatsApp Image 2026-04-09 at 1.53.02 PM.jpeg"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:57:11+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_25",
+          "correct": true,
+          "time_s": 10,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.9,
+          "next_question_id": "q_master_73"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:57:21+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_73",
+          "correct": true,
+          "time_s": 9,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_61"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:57:28+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_61",
+          "correct": true,
+          "time_s": 6,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_76"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:57:36+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_76",
+          "correct": true,
+          "time_s": 7,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_62"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:57:44+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_62",
+          "correct": true,
+          "time_s": 7,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": null
+        }
+      },
+      {
+        "ts": "2026-04-09T11:59:12+00:00",
+        "type": "upload_rejected",
+        "details": {
+          "mastery_penalty": "-0.15",
+          "file": "static\\uploads\\d0690198-dd98-4ef8-92cb-a15aac896785_WhatsApp Image 2026-04-09 at 1.58.50 PM.jpeg"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:59:54+00:00",
+        "type": "upload_accepted",
+        "details": {
+          "mastery_boost": "+0.10",
+          "file": "static\\uploads\\a4201d45-bda7-44ea-ac17-b6f064c2df36_WhatsApp Image 2026-04-09 at 1.59.34 PM.jpeg"
+        }
+      },
+      {
+        "ts": "2026-04-09T12:00:15+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_71",
+          "correct": true,
+          "time_s": 19,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_63"
+        }
+      },
+      {
+        "ts": "2026-04-09T12:00:24+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_63",
+          "correct": true,
+          "time_s": 8,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_67"
+        }
+      },
+      {
+        "ts": "2026-04-09T12:00:34+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_67",
+          "correct": true,
+          "time_s": 9,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_71"
+        }
+      },
+      {
+        "ts": "2026-04-09T12:00:42+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_71",
+          "correct": true,
+          "time_s": 6,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_64"
+        }
+      },
+      {
+        "ts": "2026-04-09T12:00:46+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_64",
+          "correct": true,
+          "time_s": 3,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": null
+        }
+      },
+      {
+        "ts": "2026-04-09T12:02:09+00:00",
+        "type": "upload_accepted",
+        "details": {
+          "mastery_boost": "+0.10",
+          "file": "static\\uploads\\ebb99e3b-2143-4e37-bf6f-a202a141ea40_WhatsApp Image 2026-04-09 at 2.01.26 PM.jpeg"
+        }
+      }
+    ],
+    "brain_state": {
+      "belief": 0.99,
+      "p_guess": 0.2,
+      "p_slip": 0.1,
+      "p_transit": 0.1,
+      "mastery_bias": 0.0,
+      "learning_profile": {
+        "preferred_method": "visual",
+        "pacing": "balanced",
+        "confidence": "medium",
+        "support_level": "moderate",
+        "hint_style": "step_by_step"
+      },
+      "diagnostic_questions": [
+        {
+          "id": "q_easy_0",
+          "content": "What is 4/8 + 1/8?",
+          "options": [
+            "6/8",
+            "4/8",
+            "5/8",
+            "5/16"
+          ],
+          "correct_answer": "5/8",
+          "difficulty": "easy",
+          "subject": "fractions",
+          "hints": {
+            "step_by_step": "Since the denominators are the same (8), just add the numerators: 4 + 1.",
+            "real_world": "If you have a pizza cut into 8 slices, and you eat 4 slices and then another 1 slices, you've eaten 5 slices.",
+            "visual": "Imagine two visual bars both split into 8 pieces. Highlighting 4 pieces on the first and 1 on the second combines to 5 total pieces out of 8."
+          },
+          "visual_data": {
+            "left": {
+              "numerator": 4,
+              "denominator": 8
+            },
+            "right": {
+              "numerator": 1,
+              "denominator": 8
+            }
+          }
+        }
+      ]
+    }
+  },
+  "4b78521d-8637-41d8-a73e-ddf72fe4b78a": {
+    "password_hash": "scrypt:32768:8:1$n6yNPx7tkvjkpvNJ$451ebbc1eccd6b8c5c0386bd5fb4f0aa611d5d84f3d26d3fd1dd6d8b08b07e28e15eaa6a97872830150254eb95771c1a19f3c341ca7c081c44c8470da07e9e8d",
+    "profile_configured": true,
+    "diagnostic_index": 1,
+    "diagnostic_correct": 0,
+    "diagnostic_time_sum": 0.0,
+    "diagnostic_completed": true,
+    "topic_intro_seen_fractions": true,
+    "current_action": {
+      "type": "question",
+      "id": "q_master_68",
+      "content": "What is 2/4 \u00d7 1/2?",
+      "options": [
+        "2/9",
+        "2/8",
+        "3/8",
+        "1/8"
+      ],
+      "difficulty": "master",
+      "subject": "fractions"
+    },
+    "hint_used_current_action": false,
+    "hint_count_current_action": 0,
+    "attempt_count_current_action": 1,
+    "questions_since_last_upload_fractions": 4,
+    "seen_questions_fractions": [
+      "q_easy_17",
+      "q_medium_20",
+      "q_hard_48",
+      "q_master_74",
+      "q_master_68"
+    ],
+    "activity": [
+      {
+        "ts": "2026-04-09T11:42:19+00:00",
+        "type": "profile_configured",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:42:19+00:00",
+        "type": "diagnostic_completed",
+        "details": {
+          "topic": "fractions",
+          "correct": 0,
+          "total": 1,
+          "avg_time_s": 0.0,
+          "starting_mastery": 0.15
+        }
+      },
+      {
+        "ts": "2026-04-09T11:42:19+00:00",
+        "type": "topic_video_seen",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:42:19+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_easy_17",
+          "correct": true,
+          "time_s": null,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.5,
+          "next_question_id": "q_medium_20"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:42:19+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_20",
+          "correct": true,
+          "time_s": null,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.84,
+          "next_question_id": "q_hard_48"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:42:19+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_hard_48",
+          "correct": true,
+          "time_s": null,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.96,
+          "next_question_id": "q_master_74"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:42:19+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_74",
+          "correct": true,
+          "time_s": null,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_68"
+        }
+      }
+    ],
+    "brain_state": {
+      "belief": 0.99,
+      "p_guess": 0.2,
+      "p_slip": 0.1,
+      "p_transit": 0.1,
+      "mastery_bias": 0.0,
+      "learning_profile": {
+        "preferred_method": "visual",
+        "pacing": "balanced",
+        "confidence": "medium",
+        "support_level": "moderate",
+        "hint_style": "step_by_step"
+      },
+      "diagnostic_questions": [
+        {
+          "id": "q_easy_0",
+          "content": "What is 4/8 + 1/8?",
+          "options": [
+            "6/8",
+            "4/8",
+            "5/8",
+            "5/16"
+          ],
+          "correct_answer": "5/8",
+          "difficulty": "easy",
+          "subject": "fractions",
+          "hints": {
+            "step_by_step": "Since the denominators are the same (8), just add the numerators: 4 + 1.",
+            "real_world": "If you have a pizza cut into 8 slices, and you eat 4 slices and then another 1 slices, you've eaten 5 slices.",
+            "visual": "Imagine two visual bars both split into 8 pieces. Highlighting 4 pieces on the first and 1 on the second combines to 5 total pieces out of 8."
+          },
+          "visual_data": {
+            "left": {
+              "numerator": 4,
+              "denominator": 8
+            },
+            "right": {
+              "numerator": 1,
+              "denominator": 8
+            }
+          }
+        }
+      ]
+    }
+  },
+  "8ad1f3d2-fc16-45c5-aa90-c36565018457": {
+    "password_hash": "scrypt:32768:8:1$VYAtSTK1xhOctQQD$40aead0808846552da683fbe41ed8e9c0249466b2cd8fd99ec255c9aba4b71186007ef959163e825ad5507369a7851601fa7e6620316043435b22c36d4e65242",
+    "profile_configured": true,
+    "diagnostic_index": 1,
+    "diagnostic_correct": 0,
+    "diagnostic_time_sum": 0.0,
+    "diagnostic_completed": true,
+    "topic_intro_seen_fractions": true,
+    "current_action": {
+      "type": "upload_work",
+      "question_text": "What is 3/4 \u00f7 2/5?"
+    },
+    "hint_used_current_action": false,
+    "hint_count_current_action": 0,
+    "attempt_count_current_action": 1,
+    "questions_since_last_upload_fractions": 5,
+    "seen_questions_fractions": [
+      "q_easy_18",
+      "q_medium_23",
+      "q_hard_52",
+      "q_master_66",
+      "q_master_76"
+    ],
+    "activity": [
+      {
+        "ts": "2026-04-09T11:43:02+00:00",
+        "type": "profile_configured",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:43:02+00:00",
+        "type": "diagnostic_completed",
+        "details": {
+          "topic": "fractions",
+          "correct": 0,
+          "total": 1,
+          "avg_time_s": 0.0,
+          "starting_mastery": 0.15
+        }
+      },
+      {
+        "ts": "2026-04-09T11:43:02+00:00",
+        "type": "topic_video_seen",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:43:02+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_easy_18",
+          "correct": true,
+          "time_s": null,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.5,
+          "next_question_id": "q_medium_23"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:43:02+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_23",
+          "correct": true,
+          "time_s": null,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.84,
+          "next_question_id": "q_hard_52"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:43:02+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_hard_52",
+          "correct": true,
+          "time_s": null,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.96,
+          "next_question_id": "q_master_66"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:43:02+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_66",
+          "correct": true,
+          "time_s": null,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": "q_master_76"
+        }
+      },
+      {
+        "ts": "2026-04-09T11:43:02+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_master_76",
+          "correct": true,
+          "time_s": null,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.99,
+          "next_question_id": null
+        }
+      }
+    ],
+    "brain_state": {
+      "belief": 0.99,
+      "p_guess": 0.2,
+      "p_slip": 0.1,
+      "p_transit": 0.1,
+      "mastery_bias": 0.0,
+      "learning_profile": {
+        "preferred_method": "visual",
+        "pacing": "balanced",
+        "confidence": "medium",
+        "support_level": "moderate",
+        "hint_style": "step_by_step"
+      },
+      "diagnostic_questions": [
+        {
+          "id": "q_easy_0",
+          "content": "What is 4/8 + 1/8?",
+          "options": [
+            "6/8",
+            "4/8",
+            "5/8",
+            "5/16"
+          ],
+          "correct_answer": "5/8",
+          "difficulty": "easy",
+          "subject": "fractions",
+          "hints": {
+            "step_by_step": "Since the denominators are the same (8), just add the numerators: 4 + 1.",
+            "real_world": "If you have a pizza cut into 8 slices, and you eat 4 slices and then another 1 slices, you've eaten 5 slices.",
+            "visual": "Imagine two visual bars both split into 8 pieces. Highlighting 4 pieces on the first and 1 on the second combines to 5 total pieces out of 8."
+          },
+          "visual_data": {
+            "left": {
+              "numerator": 4,
+              "denominator": 8
+            },
+            "right": {
+              "numerator": 1,
+              "denominator": 8
+            }
+          }
+        }
+      ]
+    }
+  },
+  "ahmed": {
+    "password_hash": "scrypt:32768:8:1$ooMLJ5fucOcKBS2i$41d624a67955aebcbe9bc34cd9ffa05081ab2e48cbedd488e40bd2c31bc41e6bb2fdd5cbc8c8238686ece4121d467c8758de5001f2b82f9105d6816a76385987",
+    "profile_configured": false,
+    "diagnostic_index": 0,
+    "diagnostic_correct": 0,
+    "diagnostic_time_sum": 0.0,
+    "diagnostic_completed": false,
+    "topic_intro_seen_fractions": false,
+    "current_action": null,
+    "hint_used_current_action": false,
+    "hint_count_current_action": 0,
+    "attempt_count_current_action": 1,
+    "questions_since_last_upload_fractions": 0,
+    "seen_questions_fractions": [],
+    "activity": [],
+    "brain_state": {}
+  },
+  "ahmadd": {
+    "password_hash": "scrypt:32768:8:1$u0elzgQk6OC31PBP$5baa8d7473360c3cd43108ac4d251f286171ca9d993d5a106dc30e5f2e263c75d8d0f476ff1b6b612f71467dbb8338f1664e2dbcab1b850acb64b26e7e3f23fd",
+    "profile_configured": true,
+    "diagnostic_index": 1,
+    "diagnostic_correct": 1,
+    "diagnostic_time_sum": 7.0,
+    "diagnostic_completed": true,
+    "topic_intro_seen_fractions": true,
+    "current_action": {
+      "type": "upload_work",
+      "question_text": "What is 4/6 - 2/7?"
+    },
+    "hint_used_current_action": false,
+    "hint_count_current_action": 0,
+    "attempt_count_current_action": 1,
+    "questions_since_last_upload_fractions": 5,
+    "seen_questions_fractions": [
+      "q_easy_16",
+      "q_hard_43",
+      "q_medium_39",
+      "q_medium_30",
+      "q_hard_41"
+    ],
+    "activity": [
+      {
+        "ts": "2026-04-11T09:16:41+00:00",
+        "type": "profile_configured",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:16:48+00:00",
+        "type": "diagnostic_completed",
+        "details": {
+          "topic": "fractions",
+          "correct": 1,
+          "total": 1,
+          "avg_time_s": 7.0,
+          "starting_mastery": 0.4
+        }
+      },
+      {
+        "ts": "2026-04-11T09:16:53+00:00",
+        "type": "topic_video_seen",
+        "details": {
+          "topic": "fractions"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:18:10+00:00",
+        "type": "hint_requested",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_easy_16",
+          "hint_style": "step_by_step",
+          "hint_mode": "text"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:18:16+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_easy_16",
+          "correct": true,
+          "time_s": 83,
+          "hint_used": true,
+          "attempt": 1,
+          "mastery": 0.73,
+          "next_question_id": "q_hard_43"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:19:09+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_hard_43",
+          "correct": false,
+          "time_s": 52,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.3,
+          "next_question_id": "q_hard_43"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:19:14+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_hard_43",
+          "correct": true,
+          "time_s": 57,
+          "hint_used": false,
+          "attempt": 2,
+          "mastery": 0.62,
+          "next_question_id": "q_medium_39"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:19:27+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_39",
+          "correct": false,
+          "time_s": 12,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.27,
+          "next_question_id": "q_medium_39"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:19:30+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_39",
+          "correct": true,
+          "time_s": 14,
+          "hint_used": false,
+          "attempt": 2,
+          "mastery": 0.65,
+          "next_question_id": "q_medium_30"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:20:07+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_medium_30",
+          "correct": true,
+          "time_s": 36,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.87,
+          "next_question_id": "q_hard_41"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:20:27+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_hard_41",
+          "correct": false,
+          "time_s": 19,
+          "hint_used": false,
+          "attempt": 1,
+          "mastery": 0.51,
+          "next_question_id": "q_hard_41"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:20:30+00:00",
+        "type": "answered",
+        "details": {
+          "topic": "fractions",
+          "question_id": "q_hard_41",
+          "correct": true,
+          "time_s": 22,
+          "hint_used": false,
+          "attempt": 2,
+          "mastery": 0.8,
+          "next_question_id": null
+        }
+      },
+      {
+        "ts": "2026-04-11T09:25:13+00:00",
+        "type": "upload_rejected",
+        "details": {
+          "mastery_penalty": "-0.15",
+          "file": "static\\uploads\\ee1a6cc6-46be-4a0a-97bc-7b5c01f69ca9_WhatsApp Image 2026-04-09 at 2.01.26 PM.jpeg"
+        }
+      },
+      {
+        "ts": "2026-04-11T09:25:18+00:00",
+        "type": "upload_rejected",
+        "details": {
+          "mastery_penalty": "-0.15",
+          "file": "static\\uploads\\dfcd90c3-cc0e-4a96-be85-0fae9cb40d2d_WhatsApp Image 2026-04-09 at 2.01.26 PM.jpeg"
+        }
+      }
+    ],
+    "brain_state": {
+      "belief": 0.5040375286384807,
+      "p_guess": 0.2,
+      "p_slip": 0.1,
+      "p_transit": 0.1,
+      "mastery_bias": 0.0,
+      "learning_profile": {
+        "preferred_method": "visual",
+        "pacing": "balanced",
+        "confidence": "medium",
+        "support_level": "moderate",
+        "hint_style": "step_by_step"
+      },
+      "diagnostic_questions": [
+        {
+          "id": "q_easy_0",
+          "content": "What is 4/8 + 1/8?",
+          "options": [
+            "6/8",
+            "4/8",
+            "5/8",
+            "5/16"
+          ],
+          "correct_answer": "5/8",
+          "difficulty": "easy",
+          "subject": "fractions",
+          "hints": {
+            "step_by_step": "Since the denominators are the same (8), just add the numerators: 4 + 1.",
+            "real_world": "If you have a pizza cut into 8 slices, and you eat 4 slices and then another 1 slices, you've eaten 5 slices.",
+            "visual": "Imagine two visual bars both split into 8 pieces. Highlighting 4 pieces on the first and 1 on the second combines to 5 total pieces out of 8."
+          },
+          "visual_data": {
+            "left": {
+              "numerator": 4,
+              "denominator": 8
+            },
+            "right": {
+              "numerator": 1,
+              "denominator": 8
+            }
+          }
+        }
+      ]
+    }
+  },
+  "oksh": {
+    "password_hash": "scrypt:32768:8:1$lXD7vVap0ieGrhYz$57e0c4612538fb9c6866b188b02746ba053338c62a872679e467d5cb598a9f8cea323f661a7b2a2bb064651d87324902f10b08ce3751d4655f39b89032e120c6",
+    "profile_configured": false,
+    "learning_profile": {},
+    "activity": []
+  },
+  "new": {
+    "password_hash": "scrypt:32768:8:1$g4Rk9wtITc0T8Ndb$470c0fe72f9d8f9a319369f4b391c180a98a56e463d23ab72f668e9d71610a049211e8847e870b8d7b3f101278f672f754843c75b1baecfceeeaecd446bbaf05",
+    "profile_configured": false,
+    "learning_profile": {},
+    "activity": []
+  },
+  "new1": {
+    "password_hash": "scrypt:32768:8:1$ttoL5h8rkzbEVxHN$538c9fb626f1ae446fd523c617b027e0a5f71bec3221f08ce97fa9cdaf24dd2b22520620572f32c8f59016595ffde5b5b51608299fb5ad5acc0a727333646d8c",
+    "profile_configured": false,
+    "learning_profile": {},
+    "activity": []
+  }
+}
