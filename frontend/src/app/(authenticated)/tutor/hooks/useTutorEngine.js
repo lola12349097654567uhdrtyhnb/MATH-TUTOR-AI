@@ -20,7 +20,9 @@ export function useTutorEngine(topic, router) {
     try {
       setError(null);
       const cacheBuster = Date.now();
-      const res = await fetch(`/api/tutor/session?topic=${topic}&_cb=${cacheBuster}`);
+      const res = await fetch(`/api/tutor/session?topic=${topic}&_cb=${cacheBuster}`, {
+        credentials: 'include'
+      });
       if (!res.ok) throw new Error('Failed to fetch session');
       const sessionData = await res.json();
       

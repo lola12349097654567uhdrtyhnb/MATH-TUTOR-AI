@@ -30,7 +30,8 @@ export async function POST(req) {
     });
     response.cookies.set('session_user', user.username, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
+      sameSite: 'none',
       maxAge: 60 * 60 * 24 * 7,
       path: '/'
     });
