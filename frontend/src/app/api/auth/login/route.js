@@ -30,13 +30,7 @@ export async function POST(req) {
       role: user.role
     });
 
-    response.cookies.set('session_user', user.username, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/'
-    });
+    response.headers.append('Set-Cookie', `session_user=${user.username}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`);
 
     return response;
   } catch (error) {
