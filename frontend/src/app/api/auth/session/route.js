@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import dbConnect from '@/lib/mongodb';
 import User from '@/lib/models/User';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const sessionUser = (await cookies()).get('session_user')?.value;

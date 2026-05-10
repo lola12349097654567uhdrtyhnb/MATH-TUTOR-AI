@@ -17,7 +17,11 @@ export async function POST(req) {
       [`brain_state_${topic}`]: user[`brain_state_${topic}`] || {}
     };
 
-    const pyReq = await fetch(`${process.env.PYTHON_API_URL}/api/submit_answer`, {
+    let pyUrl = process.env.PYTHON_API_URL || 'http://127.0.0.1:5000';
+    if (!pyUrl.startsWith('http')) pyUrl = `https://${pyUrl}`;
+    if (pyUrl.endsWith('/')) pyUrl = pyUrl.slice(0, -1);
+
+    const pyReq = await fetch(`${pyUrl}/api/submit_answer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -25,6 +29,11 @@ export async function POST(req) {
         hint_used, attempt_count: user[`attempt_count_current_action_${topic}`] || 1
       })
     });
+    
+    if (!pyReq.ok) {
+      const text = await pyReq.text();
+      throw new Error(`Python API error: ${pyReq.status} ${text}`);
+    }
     const python_resp = await pyReq.json();
     
     user[`brain_state_${topic}`] = python_resp.brain_state;
@@ -57,11 +66,16 @@ export async function POST(req) {
          };
          user[`current_action_${topic}`] = next_action;
       } else {
-         const actReq = await fetch(`${process.env.PYTHON_API_URL}/api/get_next_action`, {
+         const actReq = await fetch(`${pyUrl}/api/get_next_action`, {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify({ user_data: { learning_profile: user.learning_profile, [`brain_state_${topic}`]: user[`brain_state_${topic}`] }, topic, seen_questions: user[`seen_questions_${topic}`] })
          });
+         
+         if (!actReq.ok) {
+           const text = await actReq.text();
+           throw new Error(`Python API error: ${actReq.status} ${text}`);
+         }
          const actRes = await actReq.json();
          next_action = actRes.next_action;
          user[`current_action_${topic}`] = next_action;

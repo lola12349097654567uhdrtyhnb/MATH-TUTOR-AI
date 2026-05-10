@@ -23,11 +23,21 @@ export async function POST(req) {
     for (const topic of topics) {
       const user_data_for_python = { learning_profile: profile_data, [`brain_state_${topic}`]: user[`brain_state_${topic}`] || {} };
       
-      const res = await fetch(`${process.env.PYTHON_API_URL}/api/configure_student`, {
+      let pyUrl = process.env.PYTHON_API_URL || 'http://127.0.0.1:5000';
+      if (!pyUrl.startsWith('http')) pyUrl = `https://${pyUrl}`;
+      if (pyUrl.endsWith('/')) pyUrl = pyUrl.slice(0, -1);
+      
+      const res = await fetch(`${pyUrl}/api/configure_student`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_data: user_data_for_python, profile_data, topic })
       });
+      
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Python API error: ${res.status} ${text}`);
+      }
+      
       const data = await res.json();
       
       user[`brain_state_${topic}`] = data.brain_state;
