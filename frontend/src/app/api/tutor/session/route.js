@@ -11,7 +11,7 @@ export async function GET(req) {
     const topic = searchParams.get('topic') || 'fractions';
 
     const cookieStore = await cookies();
-    const sessionUser = cookieStore.get('session_user')?.value;
+    const sessionUser = req.headers.get('x-user-id') || cookieStore.get('session_user')?.value;
     let user = null;
     if (sessionUser) {
       await dbConnect();

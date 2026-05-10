@@ -5,9 +5,10 @@ import User from '@/lib/models/User';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req) {
   try {
-    const sessionUser = (await cookies()).get('session_user')?.value;
+    const cookieStore = await cookies();
+    const sessionUser = req.headers.get('x-user-id') || cookieStore.get('session_user')?.value;
     if (!sessionUser) return NextResponse.json({ role: null, username: null });
 
     await dbConnect();

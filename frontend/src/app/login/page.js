@@ -18,6 +18,9 @@ export default function Login() {
     });
     const data = await res.json();
     if (res.ok) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('session_user', data.username);
+      }
       if (data.role === 'instructor') {
         router.push('/instructor/overview');
       } else if (!data.profile_configured) {

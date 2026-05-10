@@ -6,7 +6,8 @@ import User from '@/lib/models/User';
 export async function POST(req) {
   try {
     const { topic, question_id, answer, response_time_seconds } = await req.json();
-    const sessionUser = (await cookies()).get('session_user')?.value;
+    const cookieStore = await cookies();
+    const sessionUser = req.headers.get('x-user-id') || cookieStore.get('session_user')?.value;
     
     await dbConnect();
     const user = await User.findOne({ username: sessionUser });

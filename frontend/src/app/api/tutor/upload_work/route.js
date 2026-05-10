@@ -25,7 +25,8 @@ export async function POST(req) {
     const question_text = formData.get('question_text');
     const file = formData.get('file');
 
-    const sessionUser = (await cookies()).get('session_user')?.value;
+    const cookieStore = await cookies();
+    const sessionUser = req.headers.get('x-user-id') || cookieStore.get('session_user')?.value;
     
     await dbConnect();
     const user = await User.findOne({ username: sessionUser });

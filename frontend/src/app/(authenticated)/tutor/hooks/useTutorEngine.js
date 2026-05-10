@@ -21,7 +21,7 @@ export function useTutorEngine(topic, router) {
       setError(null);
       const cacheBuster = Date.now();
       const res = await fetch(`/api/tutor/session?topic=${topic}&_cb=${cacheBuster}`, {
-        credentials: 'include'
+        headers: { 'x-user-id': typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '' }
       });
       if (!res.ok) throw new Error('Failed to fetch session');
       const sessionData = await res.json();
@@ -72,9 +72,10 @@ export function useTutorEngine(topic, router) {
     const elapsed = Math.round((Date.now() - questionStartTime) / 1000);
     
     try {
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
       const res = await fetch('/api/tutor/submit_diagnostic', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-user-id': userHeader },
         body: JSON.stringify({ topic, question_id: currentAction.id, answer: selectedAnswer, response_time_seconds: elapsed })
       });
       if (!res.ok) throw new Error('Network response was not ok');
@@ -112,9 +113,10 @@ export function useTutorEngine(topic, router) {
     const elapsed = Math.round((Date.now() - questionStartTime) / 1000);
 
     try {
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
       const res = await fetch('/api/tutor/submit_answer', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-user-id': userHeader },
         body: JSON.stringify({ topic, answer: selectedAnswer, question_id: currentAction.id, response_time_seconds: elapsed, hint_used: hintUsed })
       });
       if (!res.ok) throw new Error('Network response was not ok');
@@ -151,9 +153,10 @@ export function useTutorEngine(topic, router) {
 
   const requestHint = async () => {
     try {
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
       const res = await fetch('/api/tutor/get_hint', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-user-id': userHeader },
         body: JSON.stringify({ topic, question_id: currentAction.id })
       });
       if (!res.ok) throw new Error('Network response was not ok');
@@ -169,9 +172,10 @@ export function useTutorEngine(topic, router) {
 
   const continueFromVideo = async () => {
     try {
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
       const res = await fetch('/api/tutor/mark_intro', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-user-id': userHeader },
         body: JSON.stringify({ topic })
       });
       if (!res.ok) throw new Error('Network response was not ok');
@@ -195,8 +199,14 @@ export function useTutorEngine(topic, router) {
     formData.append('file', fileToUpload);
     formData.append('question_text', currentAction.question_text);
 
+    const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
+    
     try {
-      const res = await fetch('/api/tutor/upload_work', { method: 'POST', body: formData });
+      const res = await fetch('/api/tutor/upload_work', { 
+        method: 'POST', 
+        headers: { 'x-user-id': userHeader },
+        body: formData 
+      });
       if (!res.ok) throw new Error('Network response was not ok');
       const result = await res.json();
       
