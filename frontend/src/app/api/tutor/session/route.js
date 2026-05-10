@@ -12,16 +12,28 @@ export async function GET(req) {
 
     const cookieStore = await cookies();
     const sessionUser = cookieStore.get('session_user')?.value;
-
-    if (!sessionUser) {
-      return NextResponse.json({ logged_in: false });
+    let user = null;
+    if (sessionUser) {
+      await dbConnect();
+      user = await User.findOne({ username: sessionUser });
     }
 
-    await dbConnect();
-    const user = await User.findOne({ username: sessionUser });
-
-    if (!user) {
-      return NextResponse.json({ logged_in: false });
+    if (!sessionUser || !user) {
+      // Gather debug info
+      const allCookies = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ');
+      const headersList = Object.fromEntries(req.headers.entries());
+      
+      return NextResponse.json({ 
+        logged_in: false, 
+        debug: {
+          sessionUser_value: sessionUser || 'MISSING',
+          user_found: !!user,
+          username_searched: sessionUser,
+          all_cookies: allCookies,
+          host: headersList.host,
+          cookie_header: headersList.cookie || 'MISSING'
+        }
+      });
     }
 
     if (!user.profile_configured) {

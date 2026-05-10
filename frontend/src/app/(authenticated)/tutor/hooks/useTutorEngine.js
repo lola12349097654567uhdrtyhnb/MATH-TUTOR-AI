@@ -24,7 +24,8 @@ export function useTutorEngine(topic, router) {
       const sessionData = await res.json();
       
       if (!sessionData.logged_in) {
-        setError('Authentication failed: Your session cookie was lost or user not found in database. Please log in again.');
+        const debugStr = sessionData.debug ? JSON.stringify(sessionData.debug) : 'No debug info';
+        setError(`Auth failed! Debug info: ${debugStr}`);
         setUiState('error');
         return;
       }
