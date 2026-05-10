@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from tutor import BKTPomdpBrain
@@ -9,6 +10,7 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)  # Allow cross-origin requests from Vercel
 
 limiter = Limiter(
     get_remote_address,
@@ -19,7 +21,9 @@ limiter = Limiter(
 
 def load_brain_from_user_state(user_data, topic='fractions'):
     brain = BKTPomdpBrain(topic=topic)
-    brain.learning_profile = user_data.get('learning_profile', brain.learning_profile)
+    profile_updates = user_data.get('learning_profile', {})
+    if profile_updates:
+        brain.learning_profile.update(profile_updates)
     brain._apply_profile()
     
     state = user_data.get(f'brain_state_{topic}', {})
