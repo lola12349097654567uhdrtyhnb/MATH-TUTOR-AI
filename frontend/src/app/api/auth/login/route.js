@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import dbConnect from '@/lib/mongodb';
 import User from '@/lib/models/User';
 
@@ -22,21 +23,21 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid username or password' }, { status: 401 });
     }
 
-    const response = NextResponse.json({ 
+    const cookieStore = await cookies();
+    cookieStore.set('session_user', user.username, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/'
+    });
+
+    return NextResponse.json({ 
       success: true, 
       username: user.username, 
       profile_configured: user.profile_configured,
       role: user.role
     });
-    response.cookies.set('session_user', user.username, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/'
-    });
-
-    return response;
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
