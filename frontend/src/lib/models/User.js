@@ -12,6 +12,16 @@ const UserSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now },
     read: { type: Boolean, default: false }
   }],
+  target_topics: { type: [String], default: [] },
+  pre_assessment: {
+    completed: { type: Boolean, default: false },
+    score: { type: mongoose.Schema.Types.Mixed, default: {} },
+    questions_seen: { type: [String], default: [] }
+  },
+  post_assessment: {
+    completed: { type: Boolean, default: false },
+    score: { type: mongoose.Schema.Types.Mixed, default: {} }
+  },
   
   // Topic-specific states inside MongoDB!
   brain_state_fractions: { type: mongoose.Schema.Types.Mixed, default: {} },

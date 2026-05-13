@@ -2,10 +2,16 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import InstructionsModal from './InstructionsModal';
 
 export default function Dashboard() {
   const router = useRouter();
   const [topicStatus, setTopicStatus] = useState({});
+  const [targetTopics, setTargetTopics] = useState([]);
+  const [targetsMastered, setTargetsMastered] = useState(false);
+  const [postAssessment, setPostAssessment] = useState({ completed: false });
+  const [loading, setLoading] = useState(true);
+  const [showInstructions, setShowInstructions] = useState(false);
   useEffect(() => {
     async function checkRole() {
       const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
@@ -17,16 +23,43 @@ export default function Dashboard() {
         if (seshData.role === 'instructor') {
           router.push('/instructor/overview');
         }
+        if (!seshData.target_topics || seshData.target_topics.length < 2) {
+          router.push('/select-targets');
+          return;
+        }
+        if (!seshData.pre_assessment?.completed) {
+          router.push('/assessment?type=pre');
+          return;
+        }
+        
+        setTargetTopics(seshData.target_topics);
         if (seshData.topic_status) {
           setTopicStatus(seshData.topic_status);
         }
+        
+        const isMastered = seshData.target_topics.every(t => seshData.topic_graduated && seshData.topic_graduated[t]);
+        setTargetsMastered(isMastered);
+        setPostAssessment(seshData.post_assessment || { completed: false });
+        setLoading(false);
       }
     }
     checkRole();
+    if (typeof window !== 'undefined') {
+      const accepted = localStorage.getItem('hasAcceptedInstructions');
+      if (!accepted) {
+        setShowInstructions(true);
+      }
+    }
   }, [router]);
+
+  const handleAcceptInstructions = () => {
+    localStorage.setItem('hasAcceptedInstructions', 'true');
+    setShowInstructions(false);
+  };
 
   return (
     <div className="container">
+      {showInstructions && <InstructionsModal onAccept={handleAcceptInstructions} />}
       <header className="page-header">
         <div className="header-row">
           <div>
@@ -38,8 +71,27 @@ export default function Dashboard() {
       </header>
 
       <main>
+        {loading ? (
+          <div style={{textAlign: 'center', padding: '50px'}}><i className="fa-solid fa-spinner fa-spin fa-2x"></i></div>
+        ) : (
+          <>
+            {targetsMastered && (
+              <div className="card fade-enter-active" style={{marginBottom: '30px', textAlign: 'center', background: 'var(--success-bg, rgba(46, 213, 115, 0.1))'}}>
+                <h2 className="section-title">Congratulations! 🎉</h2>
+                <p className="section-note" style={{marginBottom: '20px'}}>You have mastered your focus topics: {targetTopics.join(' & ')}.</p>
+                {!postAssessment.completed ? (
+                  <button className="btn btn-primary" onClick={() => router.push('/assessment?type=post')} style={{fontSize: '1.2rem'}}>
+                    Take Post-Assessment
+                  </button>
+                ) : (
+                  <button className="btn btn-secondary" onClick={() => router.push('/assessment-results')} style={{fontSize: '1.2rem'}}>
+                    View Assessment Results
+                  </button>
+                )}
+              </div>
+            )}
         <div className="grid">
-          <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px'}}>
+          <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px', border: targetTopics.includes('fractions') ? '2px solid var(--primary)' : ''}}>
             <div className="icon-wrapper">
               <i className="fa-solid fa-shapes"></i>
             </div>
@@ -50,7 +102,7 @@ export default function Dashboard() {
             </Link>
           </section>
 
-          <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px'}}>
+          <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px', border: targetTopics.includes('algebra') ? '2px solid var(--primary)' : ''}}>
             <div className="icon-wrapper">
               <i className="fa-solid fa-square-root-variable"></i>
             </div>
@@ -61,7 +113,7 @@ export default function Dashboard() {
             </Link>
           </section>
 
-          <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px'}}>
+          <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px', border: targetTopics.includes('exponents') ? '2px solid var(--primary)' : ''}}>
             <div className="icon-wrapper">
               <i className="fa-solid fa-superscript"></i>
             </div>
@@ -72,7 +124,7 @@ export default function Dashboard() {
             </Link>
           </section>
 
-          <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px'}}>
+          <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px', border: targetTopics.includes('geometry') ? '2px solid var(--primary)' : ''}}>
             <div className="icon-wrapper">
               <i className="fa-solid fa-cube"></i>
             </div>
@@ -83,6 +135,8 @@ export default function Dashboard() {
             </Link>
           </section>
         </div>
+          </>
+        )}
       </main>
     </div>
   );

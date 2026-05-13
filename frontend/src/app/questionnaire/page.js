@@ -41,7 +41,7 @@ export default function Questionnaire() {
     });
     
     if (res.ok) {
-      router.push('/dashboard');
+      router.push('/select-targets');
     } else {
       alert("Failed to save profile.");
       setLoading(false);

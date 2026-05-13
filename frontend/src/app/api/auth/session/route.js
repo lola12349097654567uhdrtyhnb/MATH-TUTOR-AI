@@ -17,14 +17,20 @@ export async function GET(req) {
 
     const topics = ['fractions', 'algebra', 'exponents', 'geometry'];
     const topicStatus = {};
+    const topicGraduated = {};
     topics.forEach(t => {
       topicStatus[t] = user[`diagnostic_completed_${t}`] || user[`diagnostic_index_${t}`] > 0;
+      topicGraduated[t] = !!user[`topic_graduated_${t}`];
     });
 
     return NextResponse.json({ 
       role: user.role, 
       username: user.username,
-      topic_status: topicStatus
+      topic_status: topicStatus,
+      topic_graduated: topicGraduated,
+      target_topics: user.target_topics || [],
+      pre_assessment: user.pre_assessment || { completed: false },
+      post_assessment: user.post_assessment || { completed: false }
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

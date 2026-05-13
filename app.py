@@ -155,5 +155,28 @@ def upload_work():
         'brain_state': extract_brain_state(brain)
     })
 
+@app.route('/api/get_assessment_questions', methods=['POST'])
+def get_assessment_questions():
+    data = request.json or {}
+    topics = data.get('topics', [])
+    exclude_ids = data.get('exclude_ids', [])
+    count_per_topic = data.get('count_per_topic', 5)
+    
+    questions_path = os.path.join(os.path.dirname(__file__), 'assessment_questions.json')
+    if not os.path.exists(questions_path):
+        return jsonify({'error': 'Assessment questions bank not found'}), 404
+        
+    import json, random
+    with open(questions_path, 'r', encoding='utf-8') as f:
+        all_qs = json.load(f)
+        
+    selected_questions = []
+    for t in topics:
+        topic_qs = [q for q in all_qs if q.get('subject') == t and q.get('id') not in exclude_ids]
+        random.shuffle(topic_qs)
+        selected_questions.extend(topic_qs[:count_per_topic])
+        
+    return jsonify({'questions': selected_questions})
+
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

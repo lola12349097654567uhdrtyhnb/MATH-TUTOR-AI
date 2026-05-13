@@ -1,0 +1,66 @@
+import json
+
+questions = []
+
+# FRACTIONS (10 master questions)
+fractions_master = [
+    {"id": "q_assess_frac_master_0", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "Evaluate: 5/6 * (2/3 + 1/4)", "options": ["55/72", "25/36", "5/12", "15/24"], "correct_answer": "55/72"},
+    {"id": "q_assess_frac_master_1", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (3 1/2 - 1 1/4) / 2 1/4", "options": ["1", "2", "3", "4"], "correct_answer": "1"},
+    {"id": "q_assess_frac_master_2", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "Evaluate: 2/3 / 4/9 * 1/2", "options": ["3/4", "1/4", "3/2", "1/2"], "correct_answer": "3/4"},
+    {"id": "q_assess_frac_master_3", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "What is the result of (1/2 + 1/3)^2?", "options": ["25/36", "5/36", "25/6", "1/36"], "correct_answer": "25/36"},
+    {"id": "q_assess_frac_master_4", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: 1 / (1 + 1/2)", "options": ["2/3", "3/2", "1", "2"], "correct_answer": "2/3"},
+    {"id": "q_assess_frac_master_5", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "Evaluate: (3/4) / (5/8)", "options": ["6/5", "15/32", "5/6", "32/15"], "correct_answer": "6/5"},
+    {"id": "q_assess_frac_master_6", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "Evaluate: 1/3 * (4/5 - 1/2)", "options": ["1/10", "3/10", "1/5", "3/5"], "correct_answer": "1/10"},
+    {"id": "q_assess_frac_master_7", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "Evaluate: 7/8 / (1/4 + 1/2)", "options": ["7/6", "6/7", "7/4", "4/7"], "correct_answer": "7/6"},
+    {"id": "q_assess_frac_master_8", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "Evaluate: (2/5 * 5/8) + 1/4", "options": ["1/2", "1/4", "3/4", "3/8"], "correct_answer": "1/2"},
+    {"id": "q_assess_frac_master_9", "subject": "fractions", "difficulty": "master", "type": "multiple_choice", "content": "Evaluate: 3/4 - (1/2 * 1/3)", "options": ["7/12", "5/12", "1/4", "2/3"], "correct_answer": "7/12"}
+]
+questions.extend(fractions_master)
+
+# ALGEBRA (10 master questions)
+algebra_master = [
+    {"id": "q_assess_alg_master_0", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 - 4 = 0", "options": ["2", "4", "-2", "16"], "correct_answer": "2"},
+    {"id": "q_assess_alg_master_1", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 - x - 6 = 0", "options": ["3", "2", "6", "1"], "correct_answer": "3"},
+    {"id": "q_assess_alg_master_2", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 + 2x - 8 = 0", "options": ["2", "4", "8", "1"], "correct_answer": "2"},
+    {"id": "q_assess_alg_master_3", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 - 25 = 0", "options": ["5", "25", "-5", "10"], "correct_answer": "5"},
+    {"id": "q_assess_alg_master_4", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 - 3x - 10 = 0", "options": ["5", "2", "10", "3"], "correct_answer": "5"},
+    {"id": "q_assess_alg_master_5", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 + x - 12 = 0", "options": ["3", "4", "12", "1"], "correct_answer": "3"},
+    {"id": "q_assess_alg_master_6", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 - 36 = 0", "options": ["6", "36", "12", "18"], "correct_answer": "6"},
+    {"id": "q_assess_alg_master_7", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 - 4x - 5 = 0", "options": ["5", "1", "4", "6"], "correct_answer": "5"},
+    {"id": "q_assess_alg_master_8", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 + 3x - 18 = 0", "options": ["3", "6", "18", "9"], "correct_answer": "3"},
+    {"id": "q_assess_alg_master_9", "subject": "algebra", "difficulty": "master", "type": "multiple_choice", "content": "Find the positive solution for x: x^2 - 49 = 0", "options": ["7", "49", "14", "24"], "correct_answer": "7"}
+]
+questions.extend(algebra_master)
+
+# EXPONENTS (10 master questions)
+exponents_master = [
+    {"id": "q_assess_exp_master_0", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (2x^3)^2 / x^4", "options": ["4x^2", "2x^2", "4x^5", "x^2"], "correct_answer": "4x^2"},
+    {"id": "q_assess_exp_master_1", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (3y^2)^3 / y^5", "options": ["27y", "9y", "27y^2", "3y^6"], "correct_answer": "27y"},
+    {"id": "q_assess_exp_master_2", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (4a^4)^2 / a^6", "options": ["16a^2", "8a^2", "16a^4", "4a^2"], "correct_answer": "16a^2"},
+    {"id": "q_assess_exp_master_3", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (2b^5)^3 / b^10", "options": ["8b^5", "6b^5", "8b^2", "2b^5"], "correct_answer": "8b^5"},
+    {"id": "q_assess_exp_master_4", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (3m^3)^2 / m^4", "options": ["9m^2", "6m^2", "9m^4", "3m^2"], "correct_answer": "9m^2"},
+    {"id": "q_assess_exp_master_5", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (2p^4)^4 / p^12", "options": ["16p^4", "8p^4", "16p^2", "2p^4"], "correct_answer": "16p^4"},
+    {"id": "q_assess_exp_master_6", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (5k^2)^2 / k^3", "options": ["25k", "10k", "25k^2", "5k"], "correct_answer": "25k"},
+    {"id": "q_assess_exp_master_7", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (2n^6)^3 / n^15", "options": ["8n^3", "6n^3", "8n^6", "2n^3"], "correct_answer": "8n^3"},
+    {"id": "q_assess_exp_master_8", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (4w^3)^2 / w^4", "options": ["16w^2", "8w^2", "16w^4", "4w^2"], "correct_answer": "16w^2"},
+    {"id": "q_assess_exp_master_9", "subject": "exponents", "difficulty": "master", "type": "multiple_choice", "content": "Simplify: (3z^4)^3 / z^10", "options": ["27z^2", "9z^2", "27z^4", "3z^2"], "correct_answer": "27z^2"}
+]
+questions.extend(exponents_master)
+
+# GEOMETRY (10 master questions)
+geometry_master = [
+    {"id": "q_assess_geo_master_0", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "Find the volume of a rectangular prism with length 3, width 4, and height 5.", "options": ["60", "12", "20", "47"], "correct_answer": "60"},
+    {"id": "q_assess_geo_master_1", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "Find the area of a circle with a radius of 6.", "options": ["36pi", "12pi", "24pi", "6pi"], "correct_answer": "36pi"},
+    {"id": "q_assess_geo_master_2", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "What is the circumference of a circle with diameter 10?", "options": ["10pi", "5pi", "20pi", "100pi"], "correct_answer": "10pi"},
+    {"id": "q_assess_geo_master_3", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "Find the area of a triangle with base 8 and height 5.", "options": ["20", "40", "13", "10"], "correct_answer": "20"},
+    {"id": "q_assess_geo_master_4", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "Find the volume of a cube with side length 4.", "options": ["64", "16", "24", "48"], "correct_answer": "64"},
+    {"id": "q_assess_geo_master_5", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "Find the perimeter of a rectangle with length 7 and width 3.", "options": ["20", "10", "21", "14"], "correct_answer": "20"},
+    {"id": "q_assess_geo_master_6", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "What is the area of a trapezoid with bases 4 and 6, and a height of 5?", "options": ["25", "50", "24", "30"], "correct_answer": "25"},
+    {"id": "q_assess_geo_master_7", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "Find the hypotenuse of a right triangle with legs 6 and 8.", "options": ["10", "14", "100", "48"], "correct_answer": "10"},
+    {"id": "q_assess_geo_master_8", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "What is the volume of a cylinder with radius 3 and height 10?", "options": ["90pi", "30pi", "60pi", "100pi"], "correct_answer": "90pi"},
+    {"id": "q_assess_geo_master_9", "subject": "geometry", "difficulty": "master", "type": "multiple_choice", "content": "Find the area of a square with a perimeter of 24.", "options": ["36", "24", "16", "144"], "correct_answer": "36"}
+]
+questions.extend(geometry_master)
+
+with open('assessment_questions.json', 'w', encoding='utf-8') as f:
+    json.dump(questions, f, indent=4)
