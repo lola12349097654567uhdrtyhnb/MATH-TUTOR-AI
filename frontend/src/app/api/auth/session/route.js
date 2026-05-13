@@ -15,7 +15,17 @@ export async function GET(req) {
     const user = await User.findOne({ username: sessionUser });
     if (!user) return NextResponse.json({ role: null, username: null });
 
-    return NextResponse.json({ role: user.role, username: user.username });
+    const topics = ['fractions', 'algebra', 'exponents', 'geometry'];
+    const topicStatus = {};
+    topics.forEach(t => {
+      topicStatus[t] = user[`diagnostic_completed_${t}`] || user[`diagnostic_index_${t}`] > 0;
+    });
+
+    return NextResponse.json({ 
+      role: user.role, 
+      username: user.username,
+      topic_status: topicStatus
+    });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

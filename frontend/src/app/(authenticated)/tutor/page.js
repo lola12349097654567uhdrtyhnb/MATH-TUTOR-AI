@@ -7,7 +7,6 @@ import { useTutorEngine } from './hooks/useTutorEngine';
 import { SkeletonLoader } from './components/Shared';
 import { DiagnosticScreen } from './components/DiagnosticScreen';
 import { PracticeScreen } from './components/PracticeScreen';
-import { IntroScreen } from './components/IntroScreen';
 import { UploadScreen } from './components/UploadScreen';
 import { GraduatedScreen } from './components/GraduatedScreen';
 
@@ -37,8 +36,7 @@ function TutorContent() {
     content = <DiagnosticScreen {...engine} />;
   } else if (uiState === 'graduated') {
     content = <GraduatedScreen setUiState={engine.setUiState} setQuestionStartTime={engine.setQuestionStartTime} />;
-  } else if (uiState === 'intro') {
-    content = <IntroScreen topic={topic} remedialFeedback={engine.remedialFeedback} data={engine.data} continueFromVideo={engine.continueFromVideo} />;
+
   } else if (uiState === 'practice') {
     content = <PracticeScreen topic={topic} {...engine} />;
   } else if (uiState === 'upload') {

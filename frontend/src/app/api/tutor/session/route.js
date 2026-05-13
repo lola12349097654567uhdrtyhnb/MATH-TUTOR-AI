@@ -83,20 +83,6 @@ export async function GET(req) {
       });
     }
 
-    // Intro check
-    if (!user[`topic_intro_seen_${topic}`] && topic !== 'fractions') {
-      return NextResponse.json({
-        logged_in: true,
-        profile_configured: true,
-        diagnostic_completed: true,
-        topic_intro_required: true,
-        topic,
-        video_url: topic === 'fractions' ? '/fractions.mp4' : '/algebra_intro.mp4',
-        mastery: Math.round((user[`brain_state_${topic}`]?.belief || 0) * 100) / 100,
-        username: sessionUser
-      });
-    }
-
     // Normal practice
     let current_action = user[`current_action_${topic}`];
     if (!current_action) {

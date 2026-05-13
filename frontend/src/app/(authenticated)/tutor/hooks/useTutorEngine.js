@@ -46,8 +46,6 @@ export function useTutorEngine(topic, router) {
         setDiagnosticIndex(sessionData.progress.current);
         setDiagnosticTotal(sessionData.progress.total);
         setQuestionStartTime(Date.now());
-      } else if (sessionData.topic_intro_required) {
-        setUiState('intro');
       } else if (sessionData.next_action && sessionData.next_action.type === 'upload_work') {
         setUiState('upload');
         setCurrentAction(sessionData.next_action);
@@ -82,14 +80,9 @@ export function useTutorEngine(topic, router) {
       const result = await res.json();
       
       if (result.diagnostic_completed) {
-        if (result.topic_intro_required) {
-          setUiState('intro');
-          setData(prev => ({...prev, video_url: result.video_url, mastery: result.mastery}));
-        } else {
-          setUiState('practice');
-          setCurrentAction(result.next_action);
-          setData(prev => ({...prev, mastery: result.mastery}));
-        }
+        setUiState('practice');
+        setCurrentAction(result.next_action);
+        setData(prev => ({...prev, mastery: result.mastery}));
       } else {
         setFeedback({ text: 'Processing...', type: '' });
         setTimeout(() => {

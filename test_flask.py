@@ -1,20 +1,24 @@
 import requests
 import json
 
-data = {
-    "user_data": {
-        "brain_state_fractions": {
-            "diagnostic_questions": []
-        }
+url = "http://127.0.0.1:5000/api/configure_student"
+
+payload = {
+    "topic": "fractions",
+    "profile_data": {
+        "preferred_method": "visual"
     },
-    "profile_data": {},
-    "topic": "fractions"
+    "user_data": {
+        "learning_profile": {"preferred_method": "visual"},
+        "brain_state_fractions": {}
+    }
 }
 
-try:
-    res = requests.post("http://localhost:5000/api/configure_student", json=data)
-    out = res.json()
-    print("diagnostic_questions length:", len(out.get('diagnostic_questions', [])))
-    print("response preview:", str(out)[:200])
-except Exception as e:
-    print("Failed to reach flask:", e)
+res = requests.post(url, json=payload)
+print("FRACTIONS Status:", res.status_code)
+print("Response:", res.text)
+
+payload["topic"] = "exponents"
+res = requests.post(url, json=payload)
+print("\nEXPONENTS Status:", res.status_code)
+print("Response:", res.text)

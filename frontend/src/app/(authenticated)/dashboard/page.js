@@ -1,10 +1,11 @@
 'use client';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
   const router = useRouter();
+  const [topicStatus, setTopicStatus] = useState({});
   useEffect(() => {
     async function checkRole() {
       const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
@@ -15,6 +16,9 @@ export default function Dashboard() {
         const seshData = await sesh.json();
         if (seshData.role === 'instructor') {
           router.push('/instructor/overview');
+        }
+        if (seshData.topic_status) {
+          setTopicStatus(seshData.topic_status);
         }
       }
     }
@@ -41,7 +45,9 @@ export default function Dashboard() {
             </div>
             <h2 className="section-title">Fractions Unit</h2>
             <p className="section-note" style={{marginBottom: '20px'}}>Master adding, subtracting, and interpreting visual fractions.</p>
-            <Link className="btn btn-primary" href="/tutor?topic=fractions" style={{width: '100%'}}>Start Fractions</Link>
+            <Link className="btn btn-primary" href="/tutor?topic=fractions" style={{width: '100%'}}>
+              {topicStatus.fractions ? 'Continue Practicing' : 'Start Fractions'}
+            </Link>
           </section>
 
           <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px'}}>
@@ -50,7 +56,9 @@ export default function Dashboard() {
             </div>
             <h2 className="section-title">Algebraic Equations</h2>
             <p className="section-note" style={{marginBottom: '20px'}}>Solve for x and balance the mathematical scales.</p>
-            <Link className="btn btn-primary" href="/tutor?topic=algebra" style={{width: '100%'}}>Start Algebra</Link>
+            <Link className="btn btn-primary" href="/tutor?topic=algebra" style={{width: '100%'}}>
+              {topicStatus.algebra ? 'Continue Practicing' : 'Start Algebra'}
+            </Link>
           </section>
 
           <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px'}}>
@@ -59,7 +67,9 @@ export default function Dashboard() {
             </div>
             <h2 className="section-title">Exponents & Scientific</h2>
             <p className="section-note" style={{marginBottom: '20px'}}>Master laws of exponents and large numbers.</p>
-            <Link className="btn btn-primary" href="/tutor?topic=exponents" style={{width: '100%'}}>Start Exponents</Link>
+            <Link className="btn btn-primary" href="/tutor?topic=exponents" style={{width: '100%'}}>
+              {topicStatus.exponents ? 'Continue Practicing' : 'Start Exponents'}
+            </Link>
           </section>
 
           <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px'}}>
@@ -68,7 +78,9 @@ export default function Dashboard() {
             </div>
             <h2 className="section-title">Geometry & Areas</h2>
             <p className="section-note" style={{marginBottom: '20px'}}>Calculate spatial areas, Pythagorean, and volume.</p>
-            <Link className="btn btn-primary" href="/tutor?topic=geometry" style={{width: '100%'}}>Start Geometry</Link>
+            <Link className="btn btn-primary" href="/tutor?topic=geometry" style={{width: '100%'}}>
+              {topicStatus.geometry ? 'Continue Practicing' : 'Start Geometry'}
+            </Link>
           </section>
         </div>
       </main>
