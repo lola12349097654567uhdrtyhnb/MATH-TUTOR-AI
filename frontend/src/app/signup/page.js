@@ -6,7 +6,7 @@ import Link from 'next/link';
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isInstructor, setIsInstructor] = useState(false);
+  const [role, setRole] = useState('student');
   const [error, setError] = useState(null);
   const router = useRouter();
 
@@ -15,7 +15,7 @@ export default function Signup() {
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role: isInstructor ? 'instructor' : 'student' })
+      body: JSON.stringify({ email, password, role })
     });
     const data = await res.json();
     if (res.ok) {
@@ -42,14 +42,22 @@ export default function Signup() {
               <input type="email" placeholder="Choose an email address" required value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             
-            <div className="form-group" style={{marginBottom: '24px'}}>
+            <div className="form-group" style={{marginBottom: '16px'}}>
               <label>Password</label>
               <input type="password" placeholder="Choose a secure password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
 
-            <div className="form-group" style={{marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px'}}>
-              <input type="checkbox" id="isInstructor" checked={isInstructor} onChange={(e) => setIsInstructor(e.target.checked)} style={{width: 'auto', margin: 0}} />
-              <label htmlFor="isInstructor" style={{margin: 0, fontWeight: 400}}>Register as an Instructor (Demo Only)</label>
+            <div className="form-group" style={{marginBottom: '32px', padding: '16px', background: 'rgba(139, 92, 246, 0.05)', borderRadius: '16px', border: '1px solid rgba(139, 92, 246, 0.1)'}}>
+              <label style={{color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px'}}>
+                <i className="fa-solid fa-user-gear"></i> Account Type
+              </label>
+              <select value={role} onChange={(e) => setRole(e.target.value)} style={{background: 'var(--bg)'}}>
+                <option value="student">I am a Student</option>
+                <option value="instructor">I am an Instructor</option>
+              </select>
+              <p style={{fontSize: '0.8rem', color: 'var(--muted)', marginTop: '8px', marginLeft: '4px'}}>
+                Choose "Instructor" if you are a teacher managing students.
+              </p>
             </div>
 
             <button type="submit" className="btn btn-primary" style={{width: '100%', justifyContent: 'center'}}>
