@@ -90,6 +90,29 @@ export default function Dashboard() {
                 )}
               </div>
             )}
+
+            {!targetsMastered && !postAssessment.completed && (
+              <div className="card" style={{marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--highlight)', borderStyle: 'dashed'}}>
+                <div>
+                  <h3 style={{margin: 0}}>Ready to test your knowledge?</h3>
+                  <p className="section-note" style={{margin: '4px 0 0'}}>You can take the Post-Assessment now if you feel confident, even before full mastery.</p>
+                </div>
+                <button className="btn btn-secondary" onClick={() => router.push('/assessment?type=post')}>
+                  Manual Post-Assessment
+                </button>
+              </div>
+            )}
+
+            {postAssessment.completed && !targetsMastered && (
+               <div className="card" style={{marginBottom: '30px', textAlign: 'center'}}>
+                 <h2 className="section-title">Final Results Ready</h2>
+                 <p className="section-note" style={{marginBottom: '16px'}}>You've completed your assessment cycle. See how you did!</p>
+                 <button className="btn btn-primary" onClick={() => router.push('/assessment-results')}>
+                   View My Results
+                 </button>
+               </div>
+            )}
+
         <div className="grid">
           <section className="card card-hoverable" style={{textAlign: 'center', padding: '40px 20px', border: targetTopics.includes('fractions') ? '2px solid var(--primary)' : ''}}>
             <div className="icon-wrapper">
