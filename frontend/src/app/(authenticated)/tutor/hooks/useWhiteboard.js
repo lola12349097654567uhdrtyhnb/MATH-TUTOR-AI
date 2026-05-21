@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 export function useWhiteboard(isActive) {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isEraser, setIsEraser] = useState(false);
 
   // Resize canvas internal coordinate system to match display CSS dimensions
   const updateCanvasScale = useCallback(() => {
@@ -30,7 +31,7 @@ export function useWhiteboard(isActive) {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 4;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
     }
@@ -39,6 +40,16 @@ export function useWhiteboard(isActive) {
   const startDrawing = (e) => {
     if (!canvasRef.current) return;
     const ctx = canvasRef.current.getContext('2d');
+    
+    // Apply brush settings dynamically
+    if (isEraser) {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 24;
+    } else {
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 4;
+    }
+    
     const rect = canvasRef.current.getBoundingClientRect();
     const scaleX = canvasRef.current.width / rect.width;
     const scaleY = canvasRef.current.height / rect.height;
@@ -61,6 +72,16 @@ export function useWhiteboard(isActive) {
   const draw = (e) => {
     if (!isDrawing || !canvasRef.current) return;
     const ctx = canvasRef.current.getContext('2d');
+    
+    // Re-verify brush settings for ongoing strokes
+    if (isEraser) {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 24;
+    } else {
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 4;
+    }
+    
     const rect = canvasRef.current.getBoundingClientRect();
     const scaleX = canvasRef.current.width / rect.width;
     const scaleY = canvasRef.current.height / rect.height;
@@ -95,6 +116,8 @@ export function useWhiteboard(isActive) {
   return {
     canvasRef,
     isDrawing,
+    isEraser,
+    setIsEraser,
     startDrawing,
     draw,
     stopDrawing,

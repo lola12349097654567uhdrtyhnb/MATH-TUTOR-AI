@@ -15,6 +15,7 @@ function AssessmentContent() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [scoreTracker, setScoreTracker] = useState({});
+  const [selectedAnswer, setSelectedAnswer] = useState('');
 
   useEffect(() => {
     async function loadQuestions() {
@@ -123,17 +124,31 @@ function AssessmentContent() {
                <p className="question-text" style={{fontSize: '1.2rem'}}><MathText content={questions[currentIndex].content} /></p>
              </div>
              
-             <div className="mcq-grid">
+             <div className="mcq-grid" style={{marginBottom: '20px'}}>
                {questions[currentIndex].options.map((opt, idx) => (
                  <button 
                    key={idx} 
-                   className="mcq-btn" 
-                   onClick={() => handleAnswerFixed(opt)}
+                   className={`mcq-btn ${selectedAnswer === opt ? 'selected' : ''}`} 
+                   onClick={() => setSelectedAnswer(opt)}
                    style={{padding: '15px', fontSize: '1.1rem'}}
                  >
                    <MathText content={opt} />
                  </button>
                ))}
+             </div>
+
+             <div style={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
+               <button 
+                 className="btn btn-primary" 
+                 disabled={!selectedAnswer}
+                 onClick={() => {
+                   handleAnswerFixed(selectedAnswer);
+                   setSelectedAnswer('');
+                 }}
+                 style={{padding: '14px 40px', fontSize: '1.1rem'}}
+               >
+                 <i className="fa-solid fa-circle-check"></i> Submit Answer
+               </button>
              </div>
           </div>
         )}
