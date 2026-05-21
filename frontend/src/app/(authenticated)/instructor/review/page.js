@@ -10,21 +10,17 @@ export default function InstructorReviewGallery() {
   const [remarkText, setRemarkText] = useState({});
   const [revealedImages, setRevealedImages] = useState({});
 
+  const getUserHeader = () => typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
+
   useEffect(() => {
-    async function fetchStudents() {
-      const res = await fetch('/api/instructor/overview');
-      if (res.ok) {
-        const data = await res.json();
-        // Just extract student objects mapping from the overview payload if available, or fetch all from overview
-        // Wait, Overview only returns counts. Let's hit the new Review API without target to get ALL submissions and extract distinct students
-      }
-    }
     fetchAllSubmissions();
   }, []);
 
   async function fetchAllSubmissions() {
     setLoading(true);
-    const res = await fetch('/api/instructor/review');
+    const res = await fetch('/api/instructor/review', {
+      headers: { 'x-user-id': getUserHeader() }
+    });
     if (res.ok) {
       const data = await res.json();
       setSubmissions(data.submissions || []);
@@ -51,7 +47,7 @@ export default function InstructorReviewGallery() {
 
     const res = await fetch('/api/instructor/review', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-user-id': getUserHeader() },
       body: JSON.stringify(payload)
     });
 

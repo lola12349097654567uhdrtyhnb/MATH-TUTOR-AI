@@ -8,7 +8,10 @@ export default function InstructorOverview() {
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch('/api/instructor/overview');
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
+      const res = await fetch('/api/instructor/overview', {
+        headers: { 'x-user-id': userHeader }
+      });
       if (res.ok) {
         setData(await res.json());
       }

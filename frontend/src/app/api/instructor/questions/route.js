@@ -6,7 +6,8 @@ import Question from '@/lib/models/Question';
 
 export async function POST(req) {
   try {
-    const sessionUser = (await cookies()).get('session_user')?.value;
+    const cookieStore = await cookies();
+    const sessionUser = req.headers.get('x-user-id') || cookieStore.get('session_user')?.value;
     if (!sessionUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     await dbConnect();

@@ -8,7 +8,10 @@ export default function InstructorAssessments() {
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch('/api/instructor/assessments');
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
+      const res = await fetch('/api/instructor/assessments', {
+        headers: { 'x-user-id': userHeader }
+      });
       if (res.ok) {
         const data = await res.json();
         setResults(data.results);
