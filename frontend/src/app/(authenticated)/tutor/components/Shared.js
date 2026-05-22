@@ -62,6 +62,24 @@ export function VisualHintArea({ visual, currentTopic }) {
 function parseMathWord(word, idx) {
   if (typeof word !== 'string') return word;
   if (!word) return null;
+
+  // Handle standalone division operator
+  if (word === '/') {
+    return (
+      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25em', fontWeight: 'bold', color: '#a855f7', margin: '0 8px', verticalAlign: 'middle' }}>
+        ÷
+      </span>
+    );
+  }
+
+  // Handle standalone multiplication operator
+  if (word === '*') {
+    return (
+      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25em', fontWeight: 'bold', color: '#a855f7', margin: '0 8px', verticalAlign: 'middle' }}>
+        ×
+      </span>
+    );
+  }
   
   // Extract trailing punctuation like ",", ".", ":", ";", "?", "!"
   const punctuationMatch = word.match(/[.,;:!?]+$/);
@@ -69,9 +87,9 @@ function parseMathWord(word, idx) {
     const punc = punctuationMatch[0];
     const mainWord = word.slice(0, -punc.length);
     return (
-      <span key={idx}>
+      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
         {parseMathWord(mainWord, `${idx}-main`)}
-        {punc}
+        <span style={{ marginLeft: '1px' }}>{punc}</span>
       </span>
     );
   }
@@ -82,8 +100,8 @@ function parseMathWord(word, idx) {
     const punc = leadingPuncMatch[0];
     const mainWord = word.slice(punc.length);
     return (
-      <span key={idx}>
-        {punc}
+      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
+        <span style={{ marginRight: '1px' }}>{punc}</span>
         {parseMathWord(mainWord, `${idx}-main`)}
       </span>
     );
@@ -93,10 +111,10 @@ function parseMathWord(word, idx) {
   if (word.startsWith('(') && word.endsWith(')')) {
     const inner = word.slice(1, -1);
     return (
-      <span key={idx}>
-        (
+      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
+        <span style={{ fontSize: '1.15em', fontWeight: '500', color: 'rgba(255,255,255,0.4)', marginRight: '2px', fontFamily: 'monospace' }}>(</span>
         {parseMathWord(inner, `${idx}-in`)}
-        )
+        <span style={{ fontSize: '1.15em', fontWeight: '500', color: 'rgba(255,255,255,0.4)', marginLeft: '2px', fontFamily: 'monospace' }}>)</span>
       </span>
     );
   }
@@ -108,9 +126,9 @@ function parseMathWord(word, idx) {
     const expStr = word.substring(lastCaret + 1);
     
     return (
-      <span key={idx}>
+      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
         {parseMathWord(baseStr, `${idx}-b`)}
-        <sup style={{ fontSize: '0.7em', fontWeight: '700' }}>
+        <sup style={{ fontSize: '0.7em', fontWeight: '700', alignSelf: 'flex-start', marginTop: '-0.2em' }}>
           {parseMathWord(expStr, `${idx}-e`)}
         </sup>
       </span>
@@ -123,9 +141,9 @@ function parseMathWord(word, idx) {
     const base = varExpMatch[1];
     const exp = varExpMatch[2];
     return (
-      <span key={idx}>
+      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
         <span style={{ fontStyle: 'italic', fontFamily: 'Georgia, serif', fontWeight: '700' }}>{base}</span>
-        <sup style={{ fontSize: '0.7em', fontWeight: '700' }}>{exp}</sup>
+        <sup style={{ fontSize: '0.7em', fontWeight: '700', alignSelf: 'flex-start', marginTop: '-0.2em' }}>{exp}</sup>
       </span>
     );
   }
@@ -140,11 +158,11 @@ function parseMathWord(word, idx) {
     const afterStr = word.substring(fracIndex + fractionMatch[0].length);
     
     return (
-      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center' }}>
+      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
         {beforeStr && parseMathWord(beforeStr, `${idx}-bef`)}
-        <span style={{ display: 'inline-flex', flexDirection: 'column', verticalAlign: 'middle', textAlign: 'center', margin: '0 4px', fontSize: '0.85em', lineHeight: '1.2' }}>
-          <span style={{ borderBottom: '1px solid currentColor', padding: '0 2px' }}>{num}</span>
-          <span style={{ padding: '0 2px' }}>{den}</span>
+        <span style={{ display: 'inline-flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', margin: '0 4px', fontSize: '0.85em', lineHeight: '1.1' }}>
+          <span style={{ borderBottom: '1px solid currentColor', padding: '0 2px', display: 'inline-block' }}>{num}</span>
+          <span style={{ padding: '0 2px', display: 'inline-block' }}>{den}</span>
         </span>
         {afterStr && parseMathWord(afterStr, `${idx}-aft`)}
       </span>
@@ -154,13 +172,17 @@ function parseMathWord(word, idx) {
   // Check for standalone variable (e.g. "x", "y", "b")
   if (word.match(/^[a-zA-Z]$/) && !['a', 'A', 'I'].includes(word)) {
     return (
-      <span key={idx} style={{ fontStyle: 'italic', fontFamily: 'Georgia, serif', fontWeight: '700' }}>
+      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', fontStyle: 'italic', fontFamily: 'Georgia, serif', fontWeight: '700', verticalAlign: 'middle' }}>
         {word}
       </span>
     );
   }
   
-  return word;
+  return (
+    <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+      {word}
+    </span>
+  );
 }
 
 export function MathText({ content }) {
@@ -178,7 +200,11 @@ export function MathText({ content }) {
     });
   }, [content]);
 
-  return <>{renderedContent}</>;
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', flexWrap: 'wrap', verticalAlign: 'middle', gap: '2px 4px', lineHeight: '1.6' }}>
+      {renderedContent}
+    </span>
+  );
 }
 
 export function SkeletonLoader() {
