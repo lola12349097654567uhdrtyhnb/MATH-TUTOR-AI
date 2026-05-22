@@ -70,8 +70,8 @@ export function MathText({ content }) {
       if (!word) return null;
       if (word.trim() === '') return word; // Preserve spacing
       
-      // Remove trailing punctuation for checks (e.g. "x2," or "b7:")
-      const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+      // Remove trailing/leading punctuation for checks (e.g. "x2," or "(2/3)") without stripping intermediate slashes
+      const cleanWord = word.replace(/^[.,;:!?\(\)]+|[.,;:!?\(\)]+$/g, "");
       
       // 1. Check if fraction (e.g. 3/4)
       if (cleanWord.match(/^\d+\/\d+$/)) {
