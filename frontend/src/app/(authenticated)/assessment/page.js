@@ -25,7 +25,10 @@ function AssessmentContent() {
           headers: { 'x-user-id': userHeader }
         });
         
-        if (!res.ok) throw new Error('Failed to load assessment');
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Failed to load assessment');
+        }
         
         const data = await res.json();
         setQuestions(data.questions);
@@ -44,9 +47,24 @@ function AssessmentContent() {
     loadQuestions();
   }, [type]);
 
+  const [responses, setResponses] = useState([]);
+
   async function handleAnswerFixed(selectedOption) {
     const currentQ = questions[currentIndex];
     const isCorrect = selectedOption === currentQ.correct_answer;
+    
+    const newResponse = {
+      question_id: currentQ.id,
+      content: currentQ.content,
+      options: currentQ.options,
+      student_answer: selectedOption,
+      correct_answer: currentQ.correct_answer,
+      is_correct: isCorrect,
+      subject: currentQ.subject
+    };
+    
+    const updatedResponses = [...responses, newResponse];
+    setResponses(updatedResponses);
     
     const newScoreTracker = { ...scoreTracker };
     if (!newScoreTracker[currentQ.subject]) {
@@ -66,7 +84,8 @@ function AssessmentContent() {
       const payload = {
         type,
         score_by_topic: newScoreTracker,
-        questions_seen: questions.map(q => q.id)
+        questions_seen: questions.map(q => q.id),
+        responses: updatedResponses
       };
 
       try {
@@ -105,7 +124,32 @@ function AssessmentContent() {
         {loading ? (
           <div style={{textAlign: 'center', padding: '50px'}}><i className="fa-solid fa-spinner fa-spin fa-2x"></i></div>
         ) : error ? (
-          <div className="card"><p style={{color: 'red'}}>{error}</p></div>
+          <div className="card fade-enter-active" style={{ textAlign: 'center', padding: '40px' }}>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ef4444',
+              fontSize: '1.8rem',
+              margin: '0 auto 20px'
+            }}>
+              <i className="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '10px', color: '#f3f4f6' }}>Assessment Finished</h2>
+            <p style={{ color: 'var(--muted)', marginBottom: '30px' }}>{error}</p>
+            <button 
+              className="btn btn-primary" 
+              onClick={() => router.push('/dashboard')}
+              style={{ padding: '12px 30px', fontSize: '1rem', fontWeight: 600 }}
+            >
+              <i className="fa-solid fa-house" style={{ marginRight: '8px' }}></i> Return to Student Hub
+            </button>
+          </div>
         ) : questions.length === 0 ? (
           <div className="card"><p>No questions found.</p></div>
         ) : submitting ? (

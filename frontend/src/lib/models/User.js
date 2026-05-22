@@ -16,11 +16,13 @@ const UserSchema = new mongoose.Schema({
   pre_assessment: {
     completed: { type: Boolean, default: false },
     score: { type: mongoose.Schema.Types.Mixed, default: {} },
-    questions_seen: { type: [String], default: [] }
+    questions_seen: { type: [String], default: [] },
+    responses: { type: [mongoose.Schema.Types.Mixed], default: [] }
   },
   post_assessment: {
     completed: { type: Boolean, default: false },
-    score: { type: mongoose.Schema.Types.Mixed, default: {} }
+    score: { type: mongoose.Schema.Types.Mixed, default: {} },
+    responses: { type: [mongoose.Schema.Types.Mixed], default: [] }
   },
   
   // Topic-specific states inside MongoDB!
@@ -34,9 +36,14 @@ const UserSchema = new mongoose.Schema({
   seen_questions_fractions: { type: [String], default: [] },
   questions_since_last_upload_fractions: { type: Number, default: 0 },
   topic_intro_seen_fractions: { type: Boolean, default: false },
+  hint_used_current_action_fractions: { type: Boolean, default: false },
   mastery_streak_fractions: { type: Number, default: 0 },
   master_validations_fractions: { type: Number, default: 0 },
   topic_graduated_fractions: { type: Boolean, default: false },
+  last_difficulty_fractions: { type: String, default: null },
+  consecutive_wrong_at_diff_fractions: { type: Number, default: 0 },
+  total_at_current_diff_fractions: { type: Number, default: 0 },
+  wrong_at_current_diff_fractions: { type: Number, default: 0 },
   
   brain_state_exponents: { type: mongoose.Schema.Types.Mixed, default: {} },
   diagnostic_index_exponents: { type: Number, default: 0 },
@@ -51,6 +58,10 @@ const UserSchema = new mongoose.Schema({
   mastery_streak_exponents: { type: Number, default: 0 },
   master_validations_exponents: { type: Number, default: 0 },
   topic_graduated_exponents: { type: Boolean, default: false },
+  last_difficulty_exponents: { type: String, default: null },
+  consecutive_wrong_at_diff_exponents: { type: Number, default: 0 },
+  total_at_current_diff_exponents: { type: Number, default: 0 },
+  wrong_at_current_diff_exponents: { type: Number, default: 0 },
   
   brain_state_geometry: { type: mongoose.Schema.Types.Mixed, default: {} },
   diagnostic_index_geometry: { type: Number, default: 0 },
@@ -65,6 +76,10 @@ const UserSchema = new mongoose.Schema({
   mastery_streak_geometry: { type: Number, default: 0 },
   master_validations_geometry: { type: Number, default: 0 },
   topic_graduated_geometry: { type: Boolean, default: false },
+  last_difficulty_geometry: { type: String, default: null },
+  consecutive_wrong_at_diff_geometry: { type: Number, default: 0 },
+  total_at_current_diff_geometry: { type: Number, default: 0 },
+  wrong_at_current_diff_geometry: { type: Number, default: 0 },
 
   brain_state_algebra: { type: mongoose.Schema.Types.Mixed, default: {} },
   diagnostic_index_algebra: { type: Number, default: 0 },
@@ -79,6 +94,10 @@ const UserSchema = new mongoose.Schema({
   mastery_streak_algebra: { type: Number, default: 0 },
   master_validations_algebra: { type: Number, default: 0 },
   topic_graduated_algebra: { type: Boolean, default: false },
+  last_difficulty_algebra: { type: String, default: null },
+  consecutive_wrong_at_diff_algebra: { type: Number, default: 0 },
+  total_at_current_diff_algebra: { type: Number, default: 0 },
+  wrong_at_current_diff_algebra: { type: Number, default: 0 },
 }, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

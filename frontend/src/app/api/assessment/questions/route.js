@@ -16,6 +16,13 @@ export async function GET(req) {
     const user = await User.findOne({ username: sessionUser });
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+    if (type === 'pre' && user.pre_assessment?.completed) {
+      return NextResponse.json({ error: 'You have already completed the Pre-Assessment!' }, { status: 400 });
+    }
+    if (type === 'post' && user.post_assessment?.completed) {
+      return NextResponse.json({ error: 'You have already completed the Post-Assessment!' }, { status: 400 });
+    }
+
     const topics = user.target_topics;
     if (!topics || topics.length !== 2) {
       return NextResponse.json({ error: 'Target topics not set' }, { status: 400 });

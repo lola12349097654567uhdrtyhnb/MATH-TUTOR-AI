@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function InstructorOverview() {
   const [data, setData] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
@@ -63,8 +65,11 @@ export default function InstructorOverview() {
       ) : (
         <div className="grid">
           {data.at_risk.map((stu, i) => (
-            <div key={i} className="card" style={{borderLeft: '4px solid var(--warn-text)'}}>
-              <h3 style={{margin: '0 0 8px'}}>{stu.username}</h3>
+            <div key={i} className="card" style={{borderLeft: '4px solid var(--warn-text)', cursor: 'pointer'}} onClick={() => router.push(`/instructor/student-detail?student=${stu.username}`)}>
+              <h3 style={{margin: '0 0 8px', color: 'var(--primary)'}}>
+                <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: '6px', fontSize: '0.9rem' }}></i>
+                {stu.username}
+              </h3>
               <p style={{margin: 0, color: 'var(--muted)'}}>
                 Topic: <strong style={{color: '#fff'}}>{stu.topic}</strong>
               </p>

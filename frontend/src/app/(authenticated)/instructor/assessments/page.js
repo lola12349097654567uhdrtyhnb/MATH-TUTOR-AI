@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function InstructorAssessments() {
   const [results, setResults] = useState([]);
@@ -44,7 +45,12 @@ export default function InstructorAssessments() {
           <tbody>
             {results.map((res, i) => (
               <tr key={i} style={{borderBottom: '1px solid var(--border)'}}>
-                <td style={{padding: '16px 24px', fontWeight: 600}}>{res.username}</td>
+                <td style={{padding: '16px 24px', fontWeight: 600}}>
+                  <Link href={`/instructor/student-detail?student=${res.username}`} style={{ color: 'var(--primary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <i className="fa-solid fa-chart-line" style={{ fontSize: '0.9rem', opacity: 0.8 }}></i>
+                    {res.username}
+                  </Link>
+                </td>
                 <td style={{padding: '16px 24px'}}>
                   {res.pre_completed ? `${res.pre_score}%` : <span style={{color: 'var(--muted)'}}>Not Started</span>}
                 </td>

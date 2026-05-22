@@ -49,6 +49,9 @@ export function useTutorEngine(topic, router) {
       } else if (sessionData.next_action && sessionData.next_action.type === 'upload_work') {
         setUiState('upload');
         setCurrentAction(sessionData.next_action);
+      } else if (sessionData.next_action && sessionData.next_action.type === 'ai_intervention') {
+        setUiState('ai_intervention');
+        setCurrentAction(sessionData.next_action);
       } else {
         setUiState('practice');
         setCurrentAction(sessionData.next_action);
@@ -110,7 +113,16 @@ export function useTutorEngine(topic, router) {
       const res = await fetch('/api/tutor/submit_answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-user-id': userHeader },
-        body: JSON.stringify({ topic, answer: selectedAnswer, question_id: currentAction.id, response_time_seconds: elapsed, hint_used: hintUsed })
+        body: JSON.stringify({ 
+          topic, 
+          answer: selectedAnswer, 
+          question_id: currentAction.id, 
+          response_time_seconds: elapsed, 
+          hint_used: hintUsed,
+          question_difficulty: currentAction.difficulty,
+          correct_answer: currentAction.correct_answer || currentAction.correct,
+          question_text: currentAction.content
+        })
       });
       if (!res.ok) throw new Error('Network response was not ok');
       const result = await res.json();
@@ -128,6 +140,9 @@ export function useTutorEngine(topic, router) {
           } else if (result.next_action && result.next_action.type === 'upload_work') {
             setUiState('upload');
             setCurrentAction(result.next_action);
+          } else if (result.next_action && result.next_action.type === 'ai_intervention') {
+            setUiState('ai_intervention');
+            setCurrentAction(result.next_action);
           } else {
             setCurrentAction(result.next_action);
             setData(prev => ({...prev, mastery: result.mastery}));
@@ -136,11 +151,37 @@ export function useTutorEngine(topic, router) {
         }, 1000);
       } else {
         setSelectedAnswer('');
-        setTimeout(() => setFeedback({text:'', type:''}), 1500);
+        setTimeout(() => {
+          setFeedback({text:'', type:''});
+          if (result.next_action && result.next_action.type === 'ai_intervention') {
+            setUiState('ai_intervention');
+            setCurrentAction(result.next_action);
+          }
+        }, 1500);
       }
     } catch (err) {
       console.error(err);
       setFeedback({ text: 'Failed to submit. Please try again.', type: 'warn' });
+    }
+  };
+
+  const dismissIntervention = async () => {
+    try {
+      setUiState('loading');
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
+      const res = await fetch('/api/tutor/dismiss_intervention', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': userHeader },
+        body: JSON.stringify({ topic })
+      });
+      if (res.ok) {
+        await initSession();
+      } else {
+        setUiState('practice');
+      }
+    } catch (err) {
+      console.error(err);
+      setUiState('practice');
     }
   };
 
@@ -229,6 +270,6 @@ export function useTutorEngine(topic, router) {
     diagnosticIndex, diagnosticTotal, currentAction,
     selectedAnswer, setSelectedAnswer, feedback, setFeedback, visualData, remedialFeedback,
     submitDiagnosticAnswer, submitPracticeAnswer, requestHint, continueFromVideo, submitUpload,
-    setQuestionStartTime
+    setQuestionStartTime, dismissIntervention
   };
 }

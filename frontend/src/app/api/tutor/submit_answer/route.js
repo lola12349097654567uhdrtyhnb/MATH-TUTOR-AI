@@ -6,7 +6,7 @@ import Activity from '@/lib/models/Activity';
 
 export async function POST(req) {
   try {
-    const { topic, question_id, answer, response_time_seconds, hint_used } = await req.json();
+    const { topic, question_id, answer, response_time_seconds, hint_used, question_text, correct_answer, question_difficulty, options } = await req.json();
     const cookieStore = await cookies();
     const sessionUser = req.headers.get('x-user-id') || cookieStore.get('session_user')?.value;
     
@@ -38,14 +38,49 @@ export async function POST(req) {
     const python_resp = await pyReq.json();
     
     user[`brain_state_${topic}`] = python_resp.brain_state;
+    const attemptNumber = user[`attempt_count_current_action_${topic}`] || 1;
     
-    // Log activity
+    // --- RICH ACTIVITY LOG ---
     await Activity.create({
       username: sessionUser,
       topic,
       action: 'answer_question',
-      details: { question_id, is_correct: python_resp.is_correct }
+      details: { 
+        question_id, 
+        question_text: question_text || user[`current_action_${topic}`]?.content || '',
+        student_answer: answer,
+        correct_answer: correct_answer || user[`current_action_${topic}`]?.correct_answer || '',
+        is_correct: python_resp.is_correct,
+        difficulty: question_difficulty || user[`current_action_${topic}`]?.difficulty || 'medium',
+        attempt_number: attemptNumber,
+        options: options || user[`current_action_${topic}`]?.options || []
+      }
     });
+
+    // --- STUCK DETECTION TRACKING ---
+    const lastDiff = user[`last_difficulty_${topic}`];
+    const currentDiff = question_difficulty || user[`current_action_${topic}`]?.difficulty || 'medium';
+
+    if (lastDiff !== currentDiff) {
+      // Difficulty changed — reset counters
+      user[`consecutive_wrong_at_diff_${topic}`] = 0;
+      user[`total_at_current_diff_${topic}`] = 0;
+      user[`wrong_at_current_diff_${topic}`] = 0;
+      user[`last_difficulty_${topic}`] = currentDiff;
+    }
+
+    user[`total_at_current_diff_${topic}`] = (user[`total_at_current_diff_${topic}`] || 0) + 1;
+
+    if (!python_resp.is_correct) {
+      // Increment consecutive wrong on any incorrect submission
+      user[`consecutive_wrong_at_diff_${topic}`] = (user[`consecutive_wrong_at_diff_${topic}`] || 0) + 1;
+      user[`wrong_at_current_diff_${topic}`] = (user[`wrong_at_current_diff_${topic}`] || 0) + 1;
+    }
+
+    const totalAtDiff = user[`total_at_current_diff_${topic}`] || 1;
+    const wrongAtDiff = user[`wrong_at_current_diff_${topic}`] || 0;
+    const consecutiveWrong = user[`consecutive_wrong_at_diff_${topic}`] || 0;
+    const wrongRatio = wrongAtDiff / totalAtDiff;
 
     let next_action = null;
 
@@ -53,11 +88,43 @@ export async function POST(req) {
       if (question_id.includes('_master_')) {
         user[`mastery_streak_${topic}`] = (user[`mastery_streak_${topic}`] || 0) + 1;
       }
+
+      // --- NEW DETAILED PEDAGOGICAL INTERVENTION FLOW ---
+      // Condition A: Got this exact question wrong 2 or more times before getting it correct (attemptNumber >= 3)
+      const struggledOnThisQuestion = attemptNumber >= 3;
+
+      // Condition B: Stayed at same level for 8+ questions and got >= 50% of them wrong
+      const persistentDifficulty = (totalAtDiff >= 8 && wrongRatio >= 0.5);
+
+      const shouldIntervene = struggledOnThisQuestion || persistentDifficulty;
+
+      // Reset attempt and consecutive counters for next action
       user[`attempt_count_current_action_${topic}`] = 1;
       user[`hint_used_current_action_${topic}`] = false;
       user[`questions_since_last_upload_${topic}`] = (user[`questions_since_last_upload_${topic}`] || 0) + 1;
+      user[`consecutive_wrong_at_diff_${topic}`] = 0; // reset consecutive wrong on correct answer
 
-      if (user[`questions_since_last_upload_${topic}`] >= 5 && document_is_hard_enough(python_resp.mastery)) {
+      if (shouldIntervene) {
+        // Trigger intervention AFTER they finally answer correctly!
+        next_action = buildInterventionAction(user, topic, currentDiff, question_id, correct_answer || answer);
+        user[`current_action_${topic}`] = next_action;
+
+        // Log the intervention activity for instructor dashboard
+        await Activity.create({
+          username: sessionUser,
+          topic,
+          action: 'ai_intervention',
+          details: {
+            message: `AI Intervention triggered for ${topic} at ${currentDiff} difficulty.`,
+            difficulty: currentDiff,
+            question_id
+          }
+        });
+
+        // Reset tracking counters for the difficulty level
+        user[`total_at_current_diff_${topic}`] = 0;
+        user[`wrong_at_current_diff_${topic}`] = 0;
+      } else if (user[`questions_since_last_upload_${topic}`] >= 5 && document_is_hard_enough(python_resp.mastery)) {
          next_action = { 
            type: 'upload_work', 
            question_text: user[`current_action_${topic}`]?.content || 'Show your work.',
@@ -83,8 +150,9 @@ export async function POST(req) {
          if (next_action && next_action.id) user[`seen_questions_${topic}`].push(next_action.id);
       }
     } else {
-      user[`mastery_streak_${topic}`] = 0; // reset streak
+      user[`mastery_streak_${topic}`] = 0;
       user[`attempt_count_current_action_${topic}`] += 1;
+      // Do NOT set next_action, they stay on the current question to try again!
     }
     
     let topic_graduated = false;
@@ -113,8 +181,19 @@ export async function POST(req) {
   }
 }
 
+function buildInterventionAction(user, topic, difficulty, question_id, correct_ans) {
+  const currentQ = user[`current_action_${topic}`];
+  return {
+    type: 'ai_intervention',
+    difficulty,
+    topic,
+    question_id,
+    question_text: currentQ?.question_text || currentQ?.content || '',
+    correct_answer: correct_ans || currentQ?.correct_answer || '',
+    options: currentQ?.options || []
+  };
+}
+
 function document_is_hard_enough(mastery) {
-  // simple surrogate function for checking if we should challenge them with an upload
-  // Real implementation in python would trigger this based on difficulty bounds.
   return true;
 }

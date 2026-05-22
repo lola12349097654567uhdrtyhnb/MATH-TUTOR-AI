@@ -62,18 +62,62 @@ export function VisualHintArea({ visual, currentTopic }) {
 export function MathText({ content }) {
   const renderedContent = useMemo(() => {
     if (typeof content !== 'string') return content;
-    const parts = content.split(/(\b\d+\/\d+\b)/g);
-    return parts.map((part, i) => {
-      if (part.match(/^\d+\/\d+$/)) {
-        const [num, den] = part.split('/');
+    
+    // Split by spaces/whitespace to tokenize words cleanly without capture overlaps
+    const words = content.split(/(\s+)/);
+    
+    return words.map((word, idx) => {
+      if (!word) return null;
+      if (word.trim() === '') return word; // Preserve spacing
+      
+      // Remove trailing punctuation for checks (e.g. "x2," or "b7:")
+      const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+      
+      // 1. Check if fraction (e.g. 3/4)
+      if (cleanWord.match(/^\d+\/\d+$/)) {
+        const [num, den] = cleanWord.split('/');
         return (
-          <span key={i} style={{ display: 'inline-flex', flexDirection: 'column', verticalAlign: 'middle', textAlign: 'center', margin: '0 4px', fontSize: '0.85em', lineHeight: '1.2' }}>
+          <span key={idx} style={{ display: 'inline-flex', flexDirection: 'column', verticalAlign: 'middle', textAlign: 'center', margin: '0 4px', fontSize: '0.85em', lineHeight: '1.2' }}>
             <span style={{ borderBottom: '1px solid currentColor', padding: '0 2px' }}>{num}</span>
             <span style={{ padding: '0 2px' }}>{den}</span>
           </span>
         );
       }
-      return part;
+      
+      // 2. Check if direct variable exponent (e.g., b7, b12)
+      if (cleanWord.match(/^[a-zA-Z]\d+$/)) {
+        const base = cleanWord[0];
+        const exp = cleanWord.slice(1);
+        return (
+          <span key={idx}>
+            <span style={{ fontStyle: 'italic', fontFamily: 'Georgia, serif', fontWeight: '700' }}>{base}</span>
+            <sup style={{ fontSize: '0.7em', fontWeight: '700' }}>{exp}</sup>
+          </span>
+        );
+      }
+      
+      // 3. Check if exponent term with caret (e.g., x^2)
+      if (cleanWord.includes('^')) {
+        const [base, exp] = cleanWord.split('^');
+        return (
+          <span key={idx}>
+            <span style={{ fontStyle: 'italic', fontFamily: 'Georgia, serif', fontWeight: '700' }}>{base}</span>
+            <sup style={{ fontSize: '0.7em', fontWeight: '700' }}>{exp}</sup>
+          </span>
+        );
+      }
+      
+      // 4. Check if standalone variable (e.g. "x", "y", "b")
+      if (cleanWord.match(/^[a-zA-Z]$/) && !['a', 'A', 'I'].includes(cleanWord)) {
+        return (
+          <span key={idx} style={{ fontStyle: 'italic', fontFamily: 'Georgia, serif', fontWeight: '700' }}>
+            {word}
+          </span>
+        );
+      }
+      
+      // 5. Regular text
+      return word;
     });
   }, [content]);
 

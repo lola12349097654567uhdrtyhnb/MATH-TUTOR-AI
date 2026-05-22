@@ -9,6 +9,8 @@ import { DiagnosticScreen } from './components/DiagnosticScreen';
 import { PracticeScreen } from './components/PracticeScreen';
 import { UploadScreen } from './components/UploadScreen';
 import { GraduatedScreen } from './components/GraduatedScreen';
+import { AiInterventionScreen } from './components/AiInterventionScreen';
+import { IntroScreen } from './components/IntroScreen';
 
 function TutorContent() {
   const searchParams = useSearchParams();
@@ -36,11 +38,14 @@ function TutorContent() {
     content = <DiagnosticScreen {...engine} />;
   } else if (uiState === 'graduated') {
     content = <GraduatedScreen setUiState={engine.setUiState} setQuestionStartTime={engine.setQuestionStartTime} />;
-
+  } else if (uiState === 'intro') {
+    content = <IntroScreen topic={topic} remedialFeedback={engine.remedialFeedback} data={engine.data} continueFromVideo={engine.continueFromVideo} />;
   } else if (uiState === 'practice') {
     content = <PracticeScreen topic={topic} {...engine} />;
   } else if (uiState === 'upload') {
     content = <UploadScreen topic={topic} isActive={true} {...engine} />;
+  } else if (uiState === 'ai_intervention') {
+    content = <AiInterventionScreen topic={topic} currentAction={engine.currentAction} onDismiss={engine.dismissIntervention} />;
   }
 
   return (
