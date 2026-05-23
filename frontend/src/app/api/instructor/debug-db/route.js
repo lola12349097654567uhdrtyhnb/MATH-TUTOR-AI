@@ -7,36 +7,35 @@ export async function GET(req) {
     await dbConnect();
     const db = mongoose.connection.db;
     
-    // Get all collection names
-    const collections = await db.listCollections().toArray();
-    const colNames = collections.map(c => c.name);
+    // Find all users who have submitted the evaluation questionnaire
+    const surveySubmissions = await db.collection('users').find({
+      evaluation_questionnaire: { $exists: true, $ne: null }
+    }).project({ username: 1, role: 1, evaluation_questionnaire: 1 }).toArray();
 
-    // Get count of users
-    const usersCount = await db.collection('users').countDocuments();
-    const activitiesCount = await db.collection('activities').countDocuments();
+    // Find all student users who completed the post-assessment
+    const postAssessmentCompleters = await db.collection('users').find({
+      role: 'student',
+      'post_assessment.completed': true
+    }).project({ username: 1, email: 1, evaluation_questionnaire: 1 }).toArray();
 
-    // Find saja.sawy in the raw collection
-    const saja = await db.collection('users').findOne({ username: 'saja.sawy' });
-
-    // Get all activities for saja.sawy
-    const sajaActivities = await db.collection('activities').find({ username: 'saja.sawy' }).toArray();
-
-    // Query all upload_work activities in the database to see which students have uploaded photos
-    const allUploads = await db.collection('activities').find({ action: 'upload_work' }).project({ username: 1, topic: 1, createdAt: 1 }).toArray();
-
-    // Find a few other students to see
-    const otherStudents = await db.collection('users').find({ role: 'student' }).limit(5).toArray();
+    // Filter those who did the post-test but forgot the survey
+    const forgotSurvey = postAssessmentCompleters.filter(s => !s.evaluation_questionnaire);
 
     return NextResponse.json({
       success: true,
-      collections: colNames,
-      usersCount,
-      activitiesCount,
-      sajaActivitiesCount: sajaActivities.length,
-      allUploadsCount: allUploads.length,
-      sajaActivities,
-      saja: saja || null,
-      otherStudents: otherStudents.map(s => ({ username: s.username, role: s.role }))
+      surveySubmissionsCount: surveySubmissions.length,
+      surveySubmissions: surveySubmissions.map(s => ({
+        username: s.username,
+        role: s.role,
+        submitted_at: s.evaluation_questionnaire.submitted_at || null,
+        satisfaction: s.evaluation_questionnaire.satisfaction
+      })),
+      postAssessmentCompletersCount: postAssessmentCompleters.length,
+      forgotSurveyCount: forgotSurvey.length,
+      forgotSurvey: forgotSurvey.map(s => ({
+        username: s.username,
+        email: s.email || 'No email'
+      }))
     });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

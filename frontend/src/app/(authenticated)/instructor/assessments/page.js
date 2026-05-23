@@ -11,6 +11,7 @@ export default function InstructorAssessments() {
   const [exporterTab, setExporterTab] = useState('latex');
   const [expandedCard, setExpandedCard] = useState({});
   const [blasting, setBlasting] = useState(false);
+  const [reminding, setReminding] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -190,6 +191,28 @@ export default function InstructorAssessments() {
     }
   };
 
+  const triggerSurveyBlast = async () => {
+    if (!confirm("Are you sure you want to send Survey Reminders to students who finished their Post-Assessment but forgot the survey? Exactly one email and one notification will be sent per student!")) return;
+    setReminding(true);
+    try {
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
+      const res = await fetch('/api/instructor/send-survey-reminder', {
+        headers: { 'x-user-id': userHeader }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        alert(data.message || "Survey reminders sent successfully!");
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to trigger survey reminders.");
+      }
+    } catch (e) {
+      alert("An error occurred while sending the reminders.");
+    } finally {
+      setReminding(false);
+    }
+  };
+
   return (
     <div className="container">
       <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', marginBottom: '25px' }}>
@@ -197,29 +220,56 @@ export default function InstructorAssessments() {
           <h1 className="title">Assessment & Feedback Portal</h1>
           <p className="subtitle">Track pre/post test gains alongside student satisfaction and qualitative reviews.</p>
         </div>
-        <button 
-          className="btn btn-primary" 
-          onClick={triggerBlast} 
-          disabled={blasting}
-          style={{
-            background: 'linear-gradient(135deg, #a855f7, #6366f1)',
-            border: 'none',
-            boxShadow: '0 4px 15px rgba(168, 85, 247, 0.35)',
-            fontWeight: '700',
-            padding: '12px 24px',
-            borderRadius: '12px',
-            cursor: blasting ? 'not-allowed' : 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-        >
-          {blasting ? (
-            <><i className="fa-solid fa-spinner fa-spin"></i> Blasting...</>
-          ) : (
-            <><i className="fa-solid fa-bullhorn"></i> Send Research Blast</>
-          )}
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            className="btn btn-primary" 
+            onClick={triggerBlast} 
+            disabled={blasting}
+            style={{
+              background: 'linear-gradient(135deg, #a855f7, #6366f1)',
+              border: 'none',
+              boxShadow: '0 4px 15px rgba(168, 85, 247, 0.35)',
+              fontWeight: '700',
+              padding: '12px 24px',
+              borderRadius: '12px',
+              cursor: blasting ? 'not-allowed' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            {blasting ? (
+              <><i className="fa-solid fa-spinner fa-spin"></i> Blasting...</>
+            ) : (
+              <><i className="fa-solid fa-bullhorn"></i> Send Research Blast</>
+            )}
+          </button>
+
+          <button 
+            className="btn" 
+            onClick={triggerSurveyBlast} 
+            disabled={reminding}
+            style={{
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: '#fff',
+              border: 'none',
+              boxShadow: '0 4px 15px rgba(16, 185, 129, 0.35)',
+              fontWeight: '700',
+              padding: '12px 24px',
+              borderRadius: '12px',
+              cursor: reminding ? 'not-allowed' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            {reminding ? (
+              <><i className="fa-solid fa-spinner fa-spin"></i> Sending Reminders...</>
+            ) : (
+              <><i className="fa-solid fa-envelope"></i> Send Survey Reminders</>
+            )}
+          </button>
+        </div>
       </header>
 
       {/* Navigation Tabs */}
