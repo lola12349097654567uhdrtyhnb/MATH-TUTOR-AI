@@ -9,6 +9,7 @@ export default function InstructorAssessments() {
   const [activeTab, setActiveTab] = useState('performance');
   const [copyStatus, setCopyStatus] = useState('');
   const [exporterTab, setExporterTab] = useState('latex');
+  const [expandedCard, setExpandedCard] = useState({});
 
   useEffect(() => {
     async function fetchData() {
@@ -126,7 +127,7 @@ export default function InstructorAssessments() {
         code += `\\hline\n\\multicolumn{4}{l}{\\textbf{${currentSec}}} \\\\\n\\hline\n`;
       }
       const escaped = s.text.replace(/%/g, '\\%').replace(/&/g, '\\&');
-      code += `${escaped} & ${s.mean} & ${s.sd} & ${s.agreement}\\% \\\\\n`;
+      code += `${escaped} & ${s.mean} & ${s.sd} & ${s.agreement}\% \\\\\n`;
     });
     
     code += `\\hline\n`;
@@ -159,11 +160,18 @@ export default function InstructorAssessments() {
     setTimeout(() => setCopyStatus(''), 2000);
   };
 
+  const toggleCard = (i) => {
+    setExpandedCard(prev => ({
+      ...prev,
+      [i]: !prev[i]
+    }));
+  };
+
   return (
     <div className="container">
       <header className="page-header">
         <h1 className="title">Assessment & Feedback Portal</h1>
-        <p className="subtitle">Track pre/post test gains alongside student satisfaction and quantitative reviews.</p>
+        <p className="subtitle">Track pre/post test gains alongside student satisfaction and qualitative reviews.</p>
       </header>
 
       {/* Navigation Tabs */}
@@ -346,7 +354,7 @@ export default function InstructorAssessments() {
                           </p>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                         <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '0.78rem', background: res.evaluation_questionnaire.q1_ai_helpful === 'Yes' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)', color: res.evaluation_questionnaire.q1_ai_helpful === 'Yes' ? '#34d399' : '#f87171' }}>
                           AI Helpful: {res.evaluation_questionnaire.q1_ai_helpful}
                         </span>
@@ -356,8 +364,81 @@ export default function InstructorAssessments() {
                         <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '0.78rem', background: res.evaluation_questionnaire.q3_recommend === 'Yes' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)', color: res.evaluation_questionnaire.q3_recommend === 'Yes' ? '#34d399' : '#f87171' }}>
                           Recommend: {res.evaluation_questionnaire.q3_recommend}
                         </span>
+
+                        <button
+                          onClick={() => toggleCard(i)}
+                          style={{
+                            background: 'rgba(168, 85, 247, 0.12)',
+                            border: '1px solid rgba(168, 85, 247, 0.25)',
+                            borderRadius: '8px',
+                            padding: '4px 10px',
+                            color: '#c084fc',
+                            fontSize: '0.78rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          <i className={`fa-solid ${expandedCard[i] ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                          {expandedCard[i] ? 'Hide Scores' : 'View Detail Scores'}
+                        </button>
                       </div>
                     </div>
+
+                    {/* Expandable detailed 1-5 ratings */}
+                    {expandedCard[i] && (
+                      <div style={{
+                        marginTop: '15px',
+                        marginBottom: '15px',
+                        padding: '18px',
+                        background: 'rgba(0, 0, 0, 0.2)',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                        borderRadius: '12px',
+                        animation: 'fadeIn 0.2s'
+                      }}>
+                        {res.evaluation_questionnaire.q_math_clear === undefined ? (
+                          <p style={{ margin: 0, color: 'var(--muted)', fontSize: '0.85rem', fontStyle: 'italic' }}>
+                            <i className="fa-solid fa-circle-info"></i> Legacy student tester feedback. Individual numerical category metrics are not available for this record.
+                          </p>
+                        ) : (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '15px' }}>
+                            <div style={{ borderLeft: '3px solid #22c55e', paddingLeft: '10px' }}>
+                              <h5 style={{ margin: '0 0 5px 0', fontSize: '0.8rem', color: '#4ade80' }}>UX & Layout</h5>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Clear Math: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_math_clear}/5</strong></p>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Dark Mode: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_dark_mode}/5</strong></p>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Easy Nav: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_navigation}/5</strong></p>
+                            </div>
+                            <div style={{ borderLeft: '3px solid #eab308', paddingLeft: '10px' }}>
+                              <h5 style={{ margin: '0 0 5px 0', fontSize: '0.8rem', color: '#facc15' }}>Adaptive Engine</h5>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Right Level: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_adaptation}/5</strong></p>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Hints OK: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_hints}/5</strong></p>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Improved: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_improvement}/5</strong></p>
+                            </div>
+                            <div style={{ borderLeft: '3px solid #ec4899', paddingLeft: '10px' }}>
+                              <h5 style={{ margin: '0 0 5px 0', fontSize: '0.8rem', color: '#f472b6' }}>AI Intervention</h5>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Walkthrough: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_ai_walkthrough}/5</strong></p>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>AI Tone: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_ai_tone}/5</strong></p>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>AI Length: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_ai_length}/5</strong></p>
+                            </div>
+                            <div style={{ borderLeft: '3px solid #3b82f6', paddingLeft: '10px' }}>
+                              <h5 style={{ margin: '0 0 5px 0', fontSize: '0.8rem', color: '#60a5fa' }}>Psychology</h5>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Timer Pause: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_timer_paused}/5</strong></p>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Untimed: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_untimed}/5</strong></p>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Confident: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_confidence}/5</strong></p>
+                            </div>
+                            <div style={{ borderLeft: '3px solid #a855f7', paddingLeft: '10px' }}>
+                              <h5 style={{ margin: '0 0 5px 0', fontSize: '0.8rem', color: '#c084fc' }}>AI Review</h5>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>"Teach Me": <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_teach_me}/5</strong></p>
+                              <p style={{ margin: '3px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>Study Plan: <strong style={{color:'#fff'}}>{res.evaluation_questionnaire.q_study_plan}/5</strong></p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {res.evaluation_questionnaire.feedback_text ? (
                       <div style={{
                         background: 'rgba(0, 0, 0, 0.25)',
