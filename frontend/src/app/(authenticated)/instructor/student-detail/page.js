@@ -234,7 +234,7 @@ function StudentDetailContent() {
           <div className="card" style={{ padding: '24px' }}>
             <h3 className="section-title" style={{ margin: '0 0 20px', fontSize: '1.2rem' }}>Difficulty Breakdown</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {['easy', 'medium', 'hard'].map(diff => {
+               {['easy', 'medium', 'hard', 'master'].map(diff => {
                 const info = currentStats.difficulty[diff] || { served: 0, correct: 0 };
                 const pct = getDifficultyPercent(diff);
                 return (
@@ -250,7 +250,7 @@ function StudentDetailContent() {
                         height: '100%',
                         width: `${pct}%`,
                         borderRadius: '4px',
-                        background: diff === 'easy' ? '#22c55e' : diff === 'medium' ? '#eab308' : '#ef4444',
+                        background: diff === 'easy' ? '#22c55e' : diff === 'medium' ? '#eab308' : diff === 'hard' ? '#ef4444' : '#a855f7',
                         boxShadow: '0 0 8px rgba(255,255,255,0.1)'
                       }}></div>
                     </div>

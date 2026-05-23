@@ -50,7 +50,8 @@ export async function GET(req) {
       const difficultyBreakdown = {
         easy: { served: 0, correct: 0 },
         medium: { served: 0, correct: 0 },
-        hard: { served: 0, correct: 0 }
+        hard: { served: 0, correct: 0 },
+        master: { served: 0, correct: 0 }
       };
 
       const struggles = [];
