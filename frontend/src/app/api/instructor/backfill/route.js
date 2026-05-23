@@ -9,10 +9,20 @@ export async function GET(req) {
     
     const users = await User.find({}).lean();
     let backfilledCount = 0;
+    const debugLogs = [];
 
     for (const user of users) {
       const username = user.username;
       if (!username) continue;
+
+      const userLog = {
+        username,
+        role: user.role,
+        pre_assessment_responses_count: user.pre_assessment?.responses?.length || 0,
+        post_assessment_responses_count: user.post_assessment?.responses?.length || 0,
+        seen_geometry_count: user.seen_questions_geometry?.length || 0,
+        backfilled_this_user: 0
+      };
 
       // 1. Backfill Pre-Assessment responses
       const preResponses = user.pre_assessment?.responses || [];
@@ -47,6 +57,7 @@ export async function GET(req) {
             createdAt: user.pre_assessment.completedAt || new Date()
           });
           backfilledCount++;
+          userLog.backfilled_this_user++;
         }
       }
 
@@ -83,6 +94,7 @@ export async function GET(req) {
             createdAt: user.post_assessment.completedAt || new Date()
           });
           backfilledCount++;
+          userLog.backfilled_this_user++;
         }
       }
 
@@ -93,7 +105,6 @@ export async function GET(req) {
         const isDiagCompleted = !!user[`diagnostic_completed_${topic}`];
         
         for (const qid of seenQs) {
-          // Check if an activity for this question and topic already exists
           const exists = await Activity.findOne({
             username,
             topic,
@@ -104,7 +115,6 @@ export async function GET(req) {
           });
 
           if (!exists) {
-            // Deduce correctness (if diagnostic completed and belief is high, assume correct or balanced)
             const wasCorrect = isDiagCompleted ? true : false; 
             
             await Activity.create({
@@ -124,14 +134,19 @@ export async function GET(req) {
               createdAt: user.updatedAt || new Date()
             });
             backfilledCount++;
+            userLog.backfilled_this_user++;
           }
         }
       }
+
+      debugLogs.push(userLog);
     }
 
     return NextResponse.json({ 
       success: true, 
-      message: `Successfully backfilled ${backfilledCount} historic activity records in the live cloud database!` 
+      backfilledCount,
+      message: `Successfully backfilled ${backfilledCount} historic activity records!`,
+      debugLogs
     });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
