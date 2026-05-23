@@ -60,40 +60,52 @@ export function UploadScreen({
       reader.onload = (event) => {
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1200;
-          const MAX_HEIGHT = 1200;
-          let width = img.width;
-          let height = img.height;
+          try {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1200;
+            const MAX_HEIGHT = 1200;
+            let width = img.width;
+            let height = img.height;
 
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          canvas.toBlob((blob) => {
-            if (blob) {
-              const compressedFile = new File([blob], file.name || 'camera.jpg', { type: 'image/jpeg' });
-              resolve(compressedFile);
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+              }
             } else {
-              resolve(file);
+              if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+              }
             }
-          }, 'image/jpeg', 0.8);
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+              if (blob) {
+                try {
+                  const compressedFile = new File([blob], file.name || 'camera.jpg', { type: 'image/jpeg' });
+                  resolve(compressedFile);
+                } catch (fileErr) {
+                  // Fallback: iOS Safari compatibility, use blob directly
+                  blob.name = file.name || 'camera.jpg';
+                  resolve(blob);
+                }
+              } else {
+                resolve(file);
+              }
+            }, 'image/jpeg', 0.8);
+          } catch (canvasErr) {
+            resolve(file);
+          }
         };
+        img.onerror = () => resolve(file);
         img.src = event.target.result;
       };
+      reader.onerror = () => resolve(file);
       reader.readAsDataURL(file);
     });
   };
