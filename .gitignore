@@ -24,3 +24,5 @@ gemini_logs.txt
 # OS generated files
 .DS_Store
 Thumbs.db
+
+.vercel

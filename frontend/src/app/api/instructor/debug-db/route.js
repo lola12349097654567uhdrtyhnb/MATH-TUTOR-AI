@@ -18,6 +18,9 @@ export async function GET(req) {
     // Find saja.sawy in the raw collection
     const saja = await db.collection('users').findOne({ username: 'saja.sawy' });
 
+    // Get all activities for saja.sawy
+    const sajaActivities = await db.collection('activities').find({ username: 'saja.sawy' }).toArray();
+
     // Find a few other students to see
     const otherStudents = await db.collection('users').find({ role: 'student' }).limit(5).toArray();
 
@@ -26,6 +29,8 @@ export async function GET(req) {
       collections: colNames,
       usersCount,
       activitiesCount,
+      sajaActivitiesCount: sajaActivities.length,
+      sajaActivities,
       saja: saja || null,
       otherStudents: otherStudents.map(s => ({ username: s.username, role: s.role }))
     });
