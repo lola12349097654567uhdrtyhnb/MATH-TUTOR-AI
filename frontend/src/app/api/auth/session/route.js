@@ -30,7 +30,8 @@ export async function GET(req) {
       topic_graduated: topicGraduated,
       target_topics: user.target_topics || [],
       pre_assessment: user.pre_assessment || { completed: false },
-      post_assessment: user.post_assessment || { completed: false }
+      post_assessment: user.post_assessment || { completed: false },
+      evaluation_questionnaire: user.evaluation_questionnaire || null
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

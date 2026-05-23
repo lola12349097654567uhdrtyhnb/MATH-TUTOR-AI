@@ -99,6 +99,61 @@ function StudentDetailContent() {
         </div>
       </div>
 
+      {/* Questionnaire Feedback Card if available */}
+      {data.evaluation_questionnaire && (
+        <div className="card" style={{
+          marginBottom: '30px',
+          padding: '24px',
+          background: 'rgba(168, 85, 247, 0.05)',
+          border: '1px solid rgba(168, 85, 247, 0.15)',
+          boxShadow: '0 10px 30px rgba(168, 85, 247, 0.05)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '15px', flexWrap: 'wrap', gap: '15px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '2.5rem' }}>
+                {data.evaluation_questionnaire.satisfaction === 5 ? '😍' :
+                 data.evaluation_questionnaire.satisfaction === 4 ? '🙂' :
+                 data.evaluation_questionnaire.satisfaction === 3 ? '😐' :
+                 data.evaluation_questionnaire.satisfaction === 2 ? '🙁' : '😠'}
+              </span>
+              <div>
+                <h3 style={{ margin: 0, color: '#a855f7', fontSize: '1.2rem' }}>System Feedback Submitted</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)' }}>
+                  Submitted on: {new Date(data.evaluation_questionnaire.submitted_at).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '0.8rem', background: data.evaluation_questionnaire.q1_ai_helpful === 'Yes' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)', color: data.evaluation_questionnaire.q1_ai_helpful === 'Yes' ? '#34d399' : '#f87171' }}>
+                AI Helpful: {data.evaluation_questionnaire.q1_ai_helpful}
+              </span>
+              <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '0.8rem', background: data.evaluation_questionnaire.q2_difficulty_appropriate === 'Yes' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)', color: data.evaluation_questionnaire.q2_difficulty_appropriate === 'Yes' ? '#34d399' : '#f87171' }}>
+                Difficulty OK: {data.evaluation_questionnaire.q2_difficulty_appropriate}
+              </span>
+              <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '0.8rem', background: data.evaluation_questionnaire.q3_recommend === 'Yes' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)', color: data.evaluation_questionnaire.q3_recommend === 'Yes' ? '#34d399' : '#f87171' }}>
+                Recommend: {data.evaluation_questionnaire.q3_recommend}
+              </span>
+            </div>
+          </div>
+          {data.evaluation_questionnaire.feedback_text ? (
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.25)',
+              borderLeft: '4px solid #a855f7',
+              padding: '14px 18px',
+              borderRadius: '0 10px 10px 0',
+              fontStyle: 'italic',
+              color: '#f3f4f6',
+              fontSize: '0.95rem',
+              lineHeight: '1.5'
+            }}>
+              "{data.evaluation_questionnaire.feedback_text}"
+            </div>
+          ) : (
+            <p style={{ margin: 0, color: 'var(--muted)', fontSize: '0.9rem', fontStyle: 'italic' }}>No written suggestions provided.</p>
+          )}
+        </div>
+      )}
+
       {/* Topic Switcher Tabs */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '5px' }}>
         {data.target_topics.map(topic => (
@@ -224,13 +279,20 @@ function StudentDetailContent() {
                     {struggle.question_text}
                   </p>
                   
-                  <div style={{ display: 'flex', gap: '15px', fontSize: '0.85rem' }}>
+                  <div style={{ display: 'flex', gap: '15px', fontSize: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
                     <span style={{ color: '#f87171', background: 'rgba(239, 68, 68, 0.08)', padding: '4px 8px', borderRadius: '4px' }}>
                       <strong>Chose:</strong> {struggle.student_answer}
                     </span>
-                    <span style={{ color: '#4ade80', background: 'rgba(34, 197, 94, 0.08)', padding: '4px 8px', borderRadius: '4px' }}>
-                      <strong>Correct:</strong> {struggle.correct_answer}
-                    </span>
+                    {struggle.correct_answer && struggle.correct_answer !== 'N/A' && (
+                      <span style={{ color: '#4ade80', background: 'rgba(34, 197, 94, 0.08)', padding: '4px 8px', borderRadius: '4px' }}>
+                        <strong>Correct:</strong> {struggle.correct_answer}
+                      </span>
+                    )}
+                    {struggle.is_upload && (
+                      <span style={{ color: '#facc15', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
+                        <i className="fa-solid fa-file-signature"></i> Scratchpad Math Error
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}

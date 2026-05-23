@@ -15,7 +15,7 @@ export async function GET(req) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const students = await User.find({ $or: [{role: 'student'}, {role: { $exists: false }}] });
+    const students = await User.find({ $or: [{role: 'student'}, {role: { $exists: false }}] }).lean();
 
     const calculateTotal = (scoreObj) => {
       if (!scoreObj) return { correct: 0, total: 0 };
@@ -42,7 +42,8 @@ export async function GET(req) {
         post_completed: !!stu.post_assessment?.completed,
         pre_score: prePct,
         post_score: postPct,
-        delta: delta
+        delta: delta,
+        evaluation_questionnaire: stu.evaluation_questionnaire || null
       };
     });
 

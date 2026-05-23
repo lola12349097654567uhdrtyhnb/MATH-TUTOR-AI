@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import InstructionsModal from './InstructionsModal';
+import QuestionnaireModal from './QuestionnaireModal';
+
 
 export default function Dashboard() {
   const router = useRouter();
@@ -12,6 +14,7 @@ export default function Dashboard() {
   const [postAssessment, setPostAssessment] = useState({ completed: false });
   const [loading, setLoading] = useState(true);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
   useEffect(() => {
     async function checkRole() {
       const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
@@ -40,6 +43,9 @@ export default function Dashboard() {
         const isMastered = seshData.target_topics.every(t => seshData.topic_graduated && seshData.topic_graduated[t]);
         setTargetsMastered(isMastered);
         setPostAssessment(seshData.post_assessment || { completed: false });
+        if (seshData.post_assessment?.completed && !seshData.evaluation_questionnaire) {
+          setShowQuestionnaire(true);
+        }
         setLoading(false);
       }
     }
@@ -60,6 +66,7 @@ export default function Dashboard() {
   return (
     <div className="container">
       {showInstructions && <InstructionsModal onAccept={handleAcceptInstructions} />}
+      {showQuestionnaire && <QuestionnaireModal onSubmitSuccess={() => setShowQuestionnaire(false)} />}
       <header className="page-header">
         <div className="header-row">
           <div>

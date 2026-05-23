@@ -98,6 +98,7 @@ const UserSchema = new mongoose.Schema({
   consecutive_wrong_at_diff_algebra: { type: Number, default: 0 },
   total_at_current_diff_algebra: { type: Number, default: 0 },
   wrong_at_current_diff_algebra: { type: Number, default: 0 },
+  evaluation_questionnaire: { type: mongoose.Schema.Types.Mixed, default: null },
 }, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

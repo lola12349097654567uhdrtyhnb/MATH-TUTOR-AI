@@ -22,13 +22,13 @@ export async function GET(req) {
       return NextResponse.json({ error: 'Missing student query param' }, { status: 400 });
     }
 
-    const studentObj = await User.findOne({ username: targetStudent });
+    const studentObj = await User.findOne({ username: targetStudent }).lean();
     if (!studentObj) {
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }
 
     // Get all activities for this student
-    const activities = await Activity.find({ username: targetStudent }).sort({ createdAt: -1 });
+    const activities = await Activity.find({ username: targetStudent }).sort({ createdAt: -1 }).lean();
 
     const topics = ['fractions', 'algebra', 'exponents', 'geometry'];
     const topicStats = {};
@@ -36,11 +36,16 @@ export async function GET(req) {
     topics.forEach(topic => {
       const topicActs = activities.filter(act => act.topic === topic);
       
-      // Filter practice questions (excluding diagnostics & uploads)
-      const answers = topicActs.filter(act => act.action === 'answer_question');
+      // Filter practice questions, diagnostic questions, assessments, and scratchpad uploads
+      const answers = topicActs.filter(act => act.action === 'answer_question' || act.action === 'upload_work');
       
       const totalAnswers = answers.length;
-      const correctAnswers = answers.filter(act => act.details?.is_correct === true).length;
+      const correctAnswers = answers.filter(act => {
+        if (act.action === 'upload_work') {
+          return act.details?.is_valid_math === true;
+        }
+        return act.details?.is_correct === true;
+      }).length;
       
       const difficultyBreakdown = {
         easy: { served: 0, correct: 0 },
@@ -54,7 +59,7 @@ export async function GET(req) {
 
       answers.forEach(act => {
         const diff = (act.details?.difficulty || 'medium').toLowerCase();
-        const isCorrect = act.details?.is_correct || false;
+        const isCorrect = act.action === 'upload_work' ? (act.details?.is_valid_math === true) : (act.details?.is_correct || false);
 
         if (difficultyBreakdown[diff]) {
           difficultyBreakdown[diff].served += 1;
@@ -63,12 +68,13 @@ export async function GET(req) {
 
         if (!isCorrect) {
           struggles.push({
-            question_id: act.details?.question_id || 'N/A',
-            question_text: act.details?.question_text || 'Standard practice question.',
-            student_answer: act.details?.student_answer || 'N/A',
+            question_id: act.details?.question_id || act.details?.original_question_id || 'N/A',
+            question_text: act.details?.question_text || act.details?.original_question_text || 'Standard practice question.',
+            student_answer: act.details?.student_answer || act.details?.student_guess || 'N/A',
             correct_answer: act.details?.correct_answer || 'N/A',
             difficulty: diff,
-            timestamp: act.createdAt
+            timestamp: act.createdAt,
+            is_upload: act.action === 'upload_work'
           });
         }
 
@@ -98,7 +104,8 @@ export async function GET(req) {
       username: targetStudent,
       profile: studentObj.learning_profile || {},
       target_topics: studentObj.target_topics || [],
-      topic_stats: topicStats
+      topic_stats: topicStats,
+      evaluation_questionnaire: studentObj.evaluation_questionnaire || null
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

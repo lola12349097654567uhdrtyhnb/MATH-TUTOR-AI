@@ -23,8 +23,7 @@ export async function GET(req) {
     if (targetUsername) query.username = targetUsername;
 
     const submissions = await Activity.find(query)
-      .sort({ createdAt: -1 })
-      .limit(50);
+      .sort({ createdAt: -1 });
 
     // Read questions.json to inject missing text for old logs
     let questionsData = {};

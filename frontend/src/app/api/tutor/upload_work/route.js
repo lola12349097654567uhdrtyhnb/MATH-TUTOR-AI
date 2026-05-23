@@ -67,11 +67,12 @@ export async function POST(req) {
       action: 'upload_work',
       details: {
         is_valid_math: python_resp.is_valid_math,
-        image_trace: `data:${file.type};base64,${base64_image}`,
-        original_question_id: user[`current_action_${topic}`]?.original_question_id,
-        original_question_text: user[`current_action_${topic}`]?.question_text,
-        student_guess: user[`current_action_${topic}`]?.student_guess,
-        options: user[`current_action_${topic}`]?.options
+        image_trace: `data:${file.type || 'image/png'};base64,${base64_image}`,
+        original_question_id: user[`current_action_${topic}`]?.original_question_id || user[`current_action_${topic}`]?.id,
+        original_question_text: user[`current_action_${topic}`]?.question_text || user[`current_action_${topic}`]?.content || 'Upload scratchpad question.',
+        student_guess: user[`current_action_${topic}`]?.student_guess || 'N/A',
+        options: user[`current_action_${topic}`]?.options || [],
+        difficulty: user[`current_action_${topic}`]?.difficulty || 'medium'
       }
     });
 
@@ -100,17 +101,13 @@ export async function POST(req) {
 
     await user.save();
 
-    let final_video_url = '/fractions.mp4';
-    let python_sub_topic = python_resp.sub_topic || "default";
-    if (python_sub_topic in VIDEO_MAP) {
-      final_video_url = VIDEO_MAP[python_sub_topic];
-    }
+    let final_video_url = null;
 
     return NextResponse.json({
       is_valid_math: python_resp.is_valid_math,
-      message: python_resp.is_valid_math ? "Excellent work! Math checks out." : python_resp.feedback || "Your scratchpad math didn't properly compute! Please review the topic video below before continuing.",
+      message: python_resp.is_valid_math ? "Excellent work! Math checks out." : python_resp.feedback || "Your scratchpad math didn't properly compute! Please review the topic concept review before continuing.",
       mastery: Math.round(python_resp.brain_state.belief * 100) / 100,
-      video_url: final_video_url,
+      video_url: null,
       next_action,
       topic_graduated
     });

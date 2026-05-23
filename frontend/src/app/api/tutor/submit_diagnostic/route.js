@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import dbConnect from '@/lib/mongodb';
 import User from '@/lib/models/User';
+import Activity from '@/lib/models/Activity';
 
 export async function POST(req) {
   try {
@@ -24,6 +25,25 @@ export async function POST(req) {
     });
     const python_resp = await pyReq.json();
     
+    // Log diagnostic question activity before updating current_action
+    const curQ = user[`current_action_${topic}`];
+    await Activity.create({
+      username: sessionUser,
+      topic,
+      action: 'answer_question',
+      details: {
+        question_id,
+        question_text: curQ?.content || curQ?.question_text || 'Diagnostic question.',
+        student_answer: answer,
+        correct_answer: curQ?.correct_answer || curQ?.correct || '',
+        is_correct: python_resp.is_correct,
+        difficulty: 'medium', // Diagnostics default to medium
+        attempt_number: 1,
+        is_diagnostic: true,
+        response_time_seconds
+      }
+    });
+
     user[`brain_state_${topic}`] = python_resp.brain_state;
     user[`diagnostic_time_sum_${topic}`] += response_time_seconds;
     if (python_resp.is_correct) {

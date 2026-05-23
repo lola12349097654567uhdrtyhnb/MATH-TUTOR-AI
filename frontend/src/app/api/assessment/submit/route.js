@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import dbConnect from '@/lib/mongodb';
 import User from '@/lib/models/User';
+import Activity from '@/lib/models/Activity';
 
 export async function POST(req) {
   try {
@@ -32,6 +33,28 @@ export async function POST(req) {
         score: score_by_topic,
         responses: responses || []
       };
+    }
+
+    // Log each response as an Activity answer_question action to integrate with stats & struggles
+    if (responses && Array.isArray(responses)) {
+      for (const resp of responses) {
+        await Activity.create({
+          username: sessionUser,
+          topic: resp.subject || 'fractions',
+          action: 'answer_question',
+          details: {
+            question_id: resp.question_id,
+            question_text: resp.content || 'Assessment question.',
+            student_answer: resp.student_answer,
+            correct_answer: resp.correct_answer,
+            is_correct: resp.is_correct,
+            difficulty: 'medium', // Assessment defaults to medium
+            attempt_number: 1,
+            is_assessment: true,
+            assessment_type: type
+          }
+        });
+      }
     }
 
     await user.save();
