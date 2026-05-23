@@ -34,7 +34,7 @@ export async function GET(req) {
       activitiesCount,
       sajaActivitiesCount: sajaActivities.length,
       allUploadsCount: allUploads.length,
-      allUploads: allUploads.map(u => ({ username: u.username, topic: u.topic, date: u.createdAt })),
+      sajaActivities,
       saja: saja || null,
       otherStudents: otherStudents.map(s => ({ username: s.username, role: s.role }))
     });
