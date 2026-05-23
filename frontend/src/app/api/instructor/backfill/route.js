@@ -2,11 +2,62 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/lib/models/User';
 import Activity from '@/lib/models/Activity';
+import fs from 'fs';
+import path from 'path';
 
 export async function GET(req) {
   try {
     await dbConnect();
+
+    // 1. Load questions data for difficulty lookups
+    let questionsData = [];
+    let assessmentData = [];
+    try {
+      const qPath = path.join(process.cwd(), '../questions.json');
+      if (fs.existsSync(qPath)) questionsData = JSON.parse(fs.readFileSync(qPath, 'utf8'));
+    } catch (e) {}
+    try {
+      const aPath = path.join(process.cwd(), '../assessment_questions.json');
+      if (fs.existsSync(aPath)) assessmentData = JSON.parse(fs.readFileSync(aPath, 'utf8'));
+    } catch (e) {}
+
+    function lookupDifficulty(qid) {
+      if (!qid) return 'medium';
+      
+      // Look up in assessment_questions.json
+      const assessMatch = assessmentData.find(q => q.id === qid);
+      if (assessMatch && assessMatch.difficulty) return assessMatch.difficulty;
+      
+      // Look up in questions.json
+      const questionsMatch = questionsData.find(q => q.id === qid);
+      if (questionsMatch && questionsMatch.difficulty) return questionsMatch.difficulty;
+      
+      // Deduce from ID string
+      if (qid.includes('_easy_')) return 'easy';
+      if (qid.includes('_medium_')) return 'medium';
+      if (qid.includes('_hard_')) return 'hard';
+      if (qid.includes('_master_')) return 'master';
+      
+      return 'medium';
+    }
+
+    // 2. Perform one-time migration to correct the difficulties of all existing activities
+    const allActivities = await Activity.find({ action: 'answer_question' });
+    let migratedDifficultyCount = 0;
+    for (const act of allActivities) {
+      const qid = act.details?.question_id || act.details?.original_question_id;
+      if (qid) {
+        const correctDiff = lookupDifficulty(qid);
+        if (act.details.difficulty !== correctDiff) {
+          act.details.difficulty = correctDiff;
+          act.markModified('details');
+          await act.save();
+          migratedDifficultyCount++;
+        }
+      }
+    }
     
+    // 3. Perform normal backfill for any unrecorded historic seen lists & pre/post assessment responses
     const users = await User.find({}).lean();
     let backfilledCount = 0;
     const debugLogs = [];
@@ -24,7 +75,7 @@ export async function GET(req) {
         backfilled_this_user: 0
       };
 
-      // 1. Backfill Pre-Assessment responses
+      // Backfill Pre-Assessment responses
       const preResponses = user.pre_assessment?.responses || [];
       for (const resp of preResponses) {
         const qid = resp.question_id || resp.id;
@@ -49,7 +100,7 @@ export async function GET(req) {
               student_answer: resp.student_answer || 'N/A',
               correct_answer: resp.correct_answer || 'N/A',
               is_correct: resp.is_correct || false,
-              difficulty: 'medium',
+              difficulty: lookupDifficulty(qid),
               attempt_number: 1,
               is_assessment: true,
               assessment_type: 'pre'
@@ -61,7 +112,7 @@ export async function GET(req) {
         }
       }
 
-      // 2. Backfill Post-Assessment responses
+      // Backfill Post-Assessment responses
       const postResponses = user.post_assessment?.responses || [];
       for (const resp of postResponses) {
         const qid = resp.question_id || resp.id;
@@ -86,7 +137,7 @@ export async function GET(req) {
               student_answer: resp.student_answer || 'N/A',
               correct_answer: resp.correct_answer || 'N/A',
               is_correct: resp.is_correct || false,
-              difficulty: 'medium',
+              difficulty: lookupDifficulty(qid),
               attempt_number: 1,
               is_assessment: true,
               assessment_type: 'post'
@@ -98,7 +149,7 @@ export async function GET(req) {
         }
       }
 
-      // 3. Backfill historic practice/diagnostic question completions (from seen_questions arrays)
+      // Backfill historic practice/diagnostic question completions (from seen_questions arrays)
       const topicsList = ['fractions', 'algebra', 'exponents', 'geometry'];
       for (const topic of topicsList) {
         const seenQs = user[`seen_questions_${topic}`] || [];
@@ -127,7 +178,7 @@ export async function GET(req) {
                 student_answer: 'N/A',
                 correct_answer: 'N/A',
                 is_correct: wasCorrect,
-                difficulty: user[`last_difficulty_${topic}`] || 'medium',
+                difficulty: lookupDifficulty(qid),
                 attempt_number: 1,
                 is_diagnostic: isDiagCompleted
               },
@@ -145,7 +196,8 @@ export async function GET(req) {
     return NextResponse.json({ 
       success: true, 
       backfilledCount,
-      message: `Successfully backfilled ${backfilledCount} historic activity records!`,
+      migratedDifficultyCount,
+      message: `Successfully backfilled ${backfilledCount} historic activity records and migrated ${migratedDifficultyCount} difficulties in the live database!`,
       debugLogs
     });
   } catch (error) {
