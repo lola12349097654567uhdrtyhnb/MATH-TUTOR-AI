@@ -11,6 +11,7 @@ function StudentDetailContent() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTopic, setActiveTopic] = useState('fractions');
+  const [activeDetailTab, setActiveDetailTab] = useState('history');
 
   useEffect(() => {
     async function fetchDetail() {
@@ -156,25 +157,45 @@ function StudentDetailContent() {
 
       {/* Topic Switcher Tabs */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '5px' }}>
-        {data.target_topics.map(topic => (
-          <button
-            key={topic}
-            onClick={() => setActiveTopic(topic)}
-            style={{
-              padding: '12px 24px',
-              borderRadius: '8px',
-              border: activeTopic === topic ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)',
-              background: activeTopic === topic ? 'var(--primary)' : 'rgba(0,0,0,0.2)',
-              color: '#fff',
-              fontWeight: 600,
-              cursor: 'pointer',
-              textTransform: 'capitalize',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            {topic}
-          </button>
-        ))}
+        {['fractions', 'algebra', 'exponents', 'geometry'].map(topic => {
+          const isTarget = data.target_topics.includes(topic);
+          return (
+            <button
+              key={topic}
+              onClick={() => setActiveTopic(topic)}
+              style={{
+                padding: '12px 24px',
+                borderRadius: '8px',
+                border: activeTopic === topic ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)',
+                background: activeTopic === topic ? 'var(--primary)' : 'rgba(0,0,0,0.2)',
+                color: '#fff',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textTransform: 'capitalize',
+                transition: 'all 0.2s ease',
+                position: 'relative'
+              }}
+            >
+              {topic}
+              {isTarget && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-6px',
+                  right: '-6px',
+                  background: '#10b981',
+                  color: '#fff',
+                  fontSize: '0.65rem',
+                  padding: '2px 6px',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}>
+                  Target
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <div className="grid" style={{ marginBottom: '30px' }}>
@@ -242,60 +263,157 @@ function StudentDetailContent() {
 
         {/* Struggles and intervention logs */}
         <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <h3 className="section-title" style={{ margin: '0 0 10px', fontSize: '1.2rem' }}>Concept Struggles & Wrong Answers</h3>
-          <p className="section-note" style={{ margin: 0 }}>Most recent questions this student got wrong and what specific answer they chose.</p>
+          <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '12px', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '15px' }}>
+              <button 
+                onClick={() => setActiveDetailTab('history')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: activeDetailTab === 'history' ? 'var(--primary)' : 'var(--muted)',
+                  borderBottom: activeDetailTab === 'history' ? '2px solid var(--primary)' : 'none',
+                  paddingBottom: '6px',
+                  fontWeight: 600,
+                  fontSize: '1.05rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Practice History ({currentStats.history?.length || 0})
+              </button>
+              <button 
+                onClick={() => setActiveDetailTab('struggles')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: activeDetailTab === 'struggles' ? 'var(--primary)' : 'var(--muted)',
+                  borderBottom: activeDetailTab === 'struggles' ? '2px solid var(--primary)' : 'none',
+                  paddingBottom: '6px',
+                  fontWeight: 600,
+                  fontSize: '1.05rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Wrong Answers & Struggles ({currentStats.struggles?.length || 0})
+              </button>
+            </div>
+          </div>
 
-          {currentStats.struggles.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
-              <i className="fa-solid fa-face-smile" style={{ fontSize: '2.5rem', color: '#10b981', marginBottom: '10px' }}></i>
-              <p style={{ margin: 0, color: 'var(--muted)' }}>Perfect performance! No recorded struggles for this topic.</p>
+          {activeDetailTab === 'struggles' ? (
+            <div>
+              <p className="section-note" style={{ margin: '0 0 15px 0' }}>Most recent questions this student got wrong and what specific answer they chose.</p>
+              {(!currentStats.struggles || currentStats.struggles.length === 0) ? (
+                <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
+                  <i className="fa-solid fa-face-smile" style={{ fontSize: '2.5rem', color: '#10b981', marginBottom: '10px' }}></i>
+                  <p style={{ margin: 0, color: 'var(--muted)' }}>Perfect performance! No recorded struggles for this topic.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  {currentStats.struggles.map((struggle, idx) => (
+                    <div key={idx} style={{
+                      padding: '16px',
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                      borderRadius: '10px',
+                      position: 'relative'
+                    }}>
+                      <span style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '12px',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
+                        fontWeight: 700,
+                        background: struggle.difficulty === 'easy' ? 'rgba(34, 197, 94, 0.15)' : struggle.difficulty === 'medium' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                        color: struggle.difficulty === 'easy' ? '#4ade80' : struggle.difficulty === 'medium' ? '#facc15' : '#f87171'
+                      }}>
+                        {struggle.difficulty}
+                      </span>
+                      
+                      <p style={{ margin: '0 0 10px', paddingRight: '60px', fontWeight: 500, fontSize: '0.95rem' }}>
+                        {struggle.question_text}
+                      </p>
+                      
+                      <div style={{ display: 'flex', gap: '15px', fontSize: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <span style={{ color: '#f87171', background: 'rgba(239, 68, 68, 0.08)', padding: '4px 8px', borderRadius: '4px' }}>
+                          <strong>Chose:</strong> {struggle.student_answer}
+                        </span>
+                        {struggle.correct_answer && struggle.correct_answer !== 'N/A' && (
+                          <span style={{ color: '#4ade80', background: 'rgba(34, 197, 94, 0.08)', padding: '4px 8px', borderRadius: '4px' }}>
+                            <strong>Correct:</strong> {struggle.correct_answer}
+                          </span>
+                        )}
+                        {struggle.is_upload && (
+                          <span style={{ color: '#facc15', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
+                            <i className="fa-solid fa-file-signature"></i> Scratchpad Math Error
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {currentStats.struggles.map((struggle, idx) => (
-                <div key={idx} style={{
-                  padding: '16px',
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.05)',
-                  borderRadius: '10px',
-                  position: 'relative'
-                }}>
-                  <span style={{
-                    position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    fontSize: '0.75rem',
-                    textTransform: 'uppercase',
-                    fontWeight: 700,
-                    background: struggle.difficulty === 'easy' ? 'rgba(34, 197, 94, 0.15)' : struggle.difficulty === 'medium' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                    color: struggle.difficulty === 'easy' ? '#4ade80' : struggle.difficulty === 'medium' ? '#facc15' : '#f87171'
-                  }}>
-                    {struggle.difficulty}
-                  </span>
-                  
-                  <p style={{ margin: '0 0 10px', paddingRight: '60px', fontWeight: 500, fontSize: '0.95rem' }}>
-                    {struggle.question_text}
-                  </p>
-                  
-                  <div style={{ display: 'flex', gap: '15px', fontSize: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <span style={{ color: '#f87171', background: 'rgba(239, 68, 68, 0.08)', padding: '4px 8px', borderRadius: '4px' }}>
-                      <strong>Chose:</strong> {struggle.student_answer}
-                    </span>
-                    {struggle.correct_answer && struggle.correct_answer !== 'N/A' && (
-                      <span style={{ color: '#4ade80', background: 'rgba(34, 197, 94, 0.08)', padding: '4px 8px', borderRadius: '4px' }}>
-                        <strong>Correct:</strong> {struggle.correct_answer}
-                      </span>
-                    )}
-                    {struggle.is_upload && (
-                      <span style={{ color: '#facc15', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
-                        <i className="fa-solid fa-file-signature"></i> Scratchpad Math Error
-                      </span>
-                    )}
-                  </div>
+            <div>
+              <p className="section-note" style={{ margin: '0 0 15px 0' }}>Complete timeline of all practice and diagnostic questions attempted by this student.</p>
+              {(!currentStats.history || currentStats.history.length === 0) ? (
+                <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
+                  <i className="fa-solid fa-hourglass" style={{ fontSize: '2.5rem', color: 'var(--muted)', marginBottom: '10px' }}></i>
+                  <p style={{ margin: 0, color: 'var(--muted)' }}>No practice questions have been completed for this topic yet.</p>
                 </div>
-              ))}
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  {currentStats.history.map((item, idx) => (
+                    <div key={idx} style={{
+                      padding: '16px',
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                      borderRadius: '10px',
+                      position: 'relative'
+                    }}>
+                      <span style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '12px',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
+                        fontWeight: 700,
+                        background: item.is_correct ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                        color: item.is_correct ? '#4ade80' : '#f87171'
+                      }}>
+                        {item.is_correct ? 'Correct' : 'Incorrect'}
+                      </span>
+                      
+                      <p style={{ margin: '0 0 10px', paddingRight: '80px', fontWeight: 500, fontSize: '0.95rem' }}>
+                        {item.question_text}
+                      </p>
+                      
+                      <div style={{ display: 'flex', gap: '15px', fontSize: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--muted)' }}>
+                          <strong>Difficulty:</strong> <span style={{ textTransform: 'capitalize', color: '#fff' }}>{item.difficulty}</span>
+                        </span>
+                        <span>
+                          <strong>Student Answer:</strong> <span style={{ color: item.is_correct ? '#4ade80' : '#f87171' }}>{item.student_answer}</span>
+                        </span>
+                        {item.is_upload && (
+                          <span style={{ color: '#facc15', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
+                            <i className="fa-solid fa-file-signature"></i> Scratchpad Work
+                          </span>
+                        )}
+                        {item.remark && (
+                          <div style={{ width: '100%', marginTop: '8px', padding: '8px 12px', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '6px', borderLeft: '3px solid #10b981', fontSize: '0.8rem', color: '#a7f3d0' }}>
+                            <strong>Instructor Remark:</strong> "{item.remark}"
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

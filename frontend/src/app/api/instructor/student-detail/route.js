@@ -54,29 +54,37 @@ export async function GET(req) {
       };
 
       const struggles = [];
+      const history = [];
       let totalResponseTime = 0;
       let responseTimeCount = 0;
 
       answers.forEach(act => {
         const diff = (act.details?.difficulty || 'medium').toLowerCase();
-        const isCorrect = act.action === 'upload_work' ? (act.details?.is_valid_math === true) : (act.details?.is_correct || false);
+        const isCorrect = act.action === 'upload_work' ? (act.details?.is_valid_math === true || act.cleared === true) : (act.details?.is_correct || false);
 
         if (difficultyBreakdown[diff]) {
           difficultyBreakdown[diff].served += 1;
           if (isCorrect) difficultyBreakdown[diff].correct += 1;
         }
 
+        const struggleItem = {
+          question_id: act.details?.question_id || act.details?.original_question_id || 'N/A',
+          question_text: act.details?.question_text || act.details?.original_question_text || 'Standard practice question.',
+          student_answer: act.details?.student_answer || act.details?.student_guess || 'N/A',
+          correct_answer: act.details?.correct_answer || 'N/A',
+          difficulty: diff,
+          timestamp: act.createdAt,
+          is_upload: act.action === 'upload_work',
+          cleared: act.cleared,
+          remark: act.remark,
+          is_correct: isCorrect
+        };
+
         if (!isCorrect) {
-          struggles.push({
-            question_id: act.details?.question_id || act.details?.original_question_id || 'N/A',
-            question_text: act.details?.question_text || act.details?.original_question_text || 'Standard practice question.',
-            student_answer: act.details?.student_answer || act.details?.student_guess || 'N/A',
-            correct_answer: act.details?.correct_answer || 'N/A',
-            difficulty: diff,
-            timestamp: act.createdAt,
-            is_upload: act.action === 'upload_work'
-          });
+          struggles.push(struggleItem);
         }
+        
+        history.push(struggleItem);
 
         if (act.details?.response_time_seconds) {
           totalResponseTime += act.details.response_time_seconds;
@@ -93,7 +101,8 @@ export async function GET(req) {
         accuracy: totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0,
         average_response_time: responseTimeCount > 0 ? Math.round(totalResponseTime / responseTimeCount) : 0,
         difficulty: difficultyBreakdown,
-        struggles: struggles.slice(0, 10), // Return up to 10 struggles
+        struggles: struggles.slice(0, 15), // Return up to 15 struggles
+        history: history.slice(0, 25), // Return up to 25 history items
         interventions_count: interventions,
         mastery: Math.round((studentObj[`brain_state_${topic}`]?.belief || 0) * 100) / 100,
         graduated: !!studentObj[`topic_graduated_${topic}`]
