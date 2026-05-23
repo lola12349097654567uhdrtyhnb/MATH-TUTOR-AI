@@ -4,6 +4,15 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/lib/models/User';
 import Activity from '@/lib/models/Activity';
 
+function lookupDifficulty(qid) {
+  if (!qid) return 'medium';
+  if (qid.includes('_easy_')) return 'easy';
+  if (qid.includes('_medium_')) return 'medium';
+  if (qid.includes('_hard_')) return 'hard';
+  if (qid.includes('_master_')) return 'master';
+  return 'medium';
+}
+
 export async function POST(req) {
   try {
     const cookieStore = await cookies();
@@ -48,7 +57,7 @@ export async function POST(req) {
             student_answer: resp.student_answer,
             correct_answer: resp.correct_answer,
             is_correct: resp.is_correct,
-            difficulty: 'medium', // Assessment defaults to medium
+            difficulty: lookupDifficulty(resp.question_id),
             attempt_number: 1,
             is_assessment: true,
             assessment_type: type
