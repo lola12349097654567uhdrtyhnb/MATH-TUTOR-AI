@@ -21,6 +21,9 @@ export async function GET(req) {
     // Get all activities for saja.sawy
     const sajaActivities = await db.collection('activities').find({ username: 'saja.sawy' }).toArray();
 
+    // Query all upload_work activities in the database to see which students have uploaded photos
+    const allUploads = await db.collection('activities').find({ action: 'upload_work' }).project({ username: 1, topic: 1, createdAt: 1 }).toArray();
+
     // Find a few other students to see
     const otherStudents = await db.collection('users').find({ role: 'student' }).limit(5).toArray();
 
@@ -30,7 +33,8 @@ export async function GET(req) {
       usersCount,
       activitiesCount,
       sajaActivitiesCount: sajaActivities.length,
-      sajaActivities,
+      allUploadsCount: allUploads.length,
+      allUploads: allUploads.map(u => ({ username: u.username, topic: u.topic, date: u.createdAt })),
       saja: saja || null,
       otherStudents: otherStudents.map(s => ({ username: s.username, role: s.role }))
     });
