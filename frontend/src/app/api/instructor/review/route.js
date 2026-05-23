@@ -70,14 +70,16 @@ export async function POST(req) {
     const student = await User.findOne({ username: targetUsername });
     const activity = await Activity.findById(activityId);
 
-    if (!student || !activity) return NextResponse.json({ error: 'Student or Activity not found' }, { status: 404 });
+    if (!activity) return NextResponse.json({ error: 'Activity not found' }, { status: 404 });
 
     const brainKey = `brain_state_${topic}`;
-    if (!student[brainKey]) student[brainKey] = { belief: 0.3 };
+    if (student && !student[brainKey]) {
+      student[brainKey] = { belief: 0.3 };
+    }
     
     if (action === 'grant_mastery') {
       // "Student is Correct"
-      if (activity.details?.is_valid_math === false) {
+      if (student && activity.details?.is_valid_math === false) {
         // OVERRIDE: AI failed them, but instructor says they are correct
         student[brainKey].belief = 0.95; 
       }
@@ -85,7 +87,7 @@ export async function POST(req) {
       activity.cleared = true;
     } else if (action === 'penalize') {
       // "Student is Incorrect"
-      if (activity.details?.is_valid_math === true) {
+      if (student && activity.details?.is_valid_math === true) {
         // OVERRIDE: AI passed them, but instructor says they are wrong
         student[brainKey].belief = 0.05;
       }
@@ -96,15 +98,19 @@ export async function POST(req) {
     } else if (action === 'add_remark') {
       activity.remark = remarkText;
       activity.cleared = true;
-      // Send notification to student
-      student.notifications.push({
-        message: `Instructor ${inst.username} left a remark on your ${topic} work: "${remarkText}"`,
-        read: false
-      });
+      // Send notification to student if student exists
+      if (student) {
+        student.notifications.push({
+          message: `Instructor ${inst.username} left a remark on your ${topic} work: "${remarkText}"`,
+          read: false
+        });
+      }
     }
 
-    student.markModified(brainKey);
-    await student.save();
+    if (student) {
+      student.markModified(brainKey);
+      await student.save();
+    }
     await activity.save();
 
     return NextResponse.json({ success: true });

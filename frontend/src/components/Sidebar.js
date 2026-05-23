@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [role, setRole] = useState('student');
   const [postAssessmentDone, setPostAssessmentDone] = useState(false);
 
@@ -14,12 +15,19 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
       const res = await fetch('/api/auth/session');
       if (res.ok) {
         const data = await res.json();
-        if (data.role) setRole(data.role);
+        if (data.role) {
+          setRole(data.role);
+        } else {
+          // Session expired or no active session - redirect to login
+          router.push('/login');
+        }
         if (data.post_assessment?.completed) setPostAssessmentDone(true);
+      } else {
+        router.push('/login');
       }
     }
     fetchSession();
-  }, []);
+  }, [router]);
 
   const studentLinks = [
     { name: 'Dashboard', path: '/dashboard', icon: 'fa-solid fa-house' },

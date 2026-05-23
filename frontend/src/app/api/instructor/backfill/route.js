@@ -193,11 +193,25 @@ export async function GET(req) {
       debugLogs.push(userLog);
     }
 
+    // 4. Clean up orphaned activities of deleted users to free up space and clear the audit queue
+    const allUsers = await User.find({}).project({ username: 1 }).lean();
+    const existingUsernames = new Set(allUsers.map(u => u.username));
+    
+    const uniqueActivityUsernames = await Activity.distinct('username');
+    const orphanedUsernames = uniqueActivityUsernames.filter(uname => !existingUsernames.has(uname));
+    
+    let deletedActivitiesCount = 0;
+    if (orphanedUsernames.length > 0) {
+      const deleteResult = await Activity.deleteMany({ username: { $in: orphanedUsernames } });
+      deletedActivitiesCount = deleteResult.deletedCount;
+    }
+
     return NextResponse.json({ 
       success: true, 
       backfilledCount,
       migratedDifficultyCount,
-      message: `Successfully backfilled ${backfilledCount} historic activity records and migrated ${migratedDifficultyCount} difficulties in the live database!`,
+      deletedActivitiesCount,
+      message: `Successfully backfilled ${backfilledCount} historic activity records, migrated ${migratedDifficultyCount} difficulties, and purged ${deletedActivitiesCount} orphaned activities of deleted students in the live database!`,
       debugLogs
     });
   } catch (error) {
