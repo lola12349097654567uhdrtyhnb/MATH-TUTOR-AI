@@ -10,6 +10,7 @@ export default function InstructorAssessments() {
   const [copyStatus, setCopyStatus] = useState('');
   const [exporterTab, setExporterTab] = useState('latex');
   const [expandedCard, setExpandedCard] = useState({});
+  const [blasting, setBlasting] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -167,11 +168,58 @@ export default function InstructorAssessments() {
     }));
   };
 
+  const triggerBlast = async () => {
+    if (!confirm("Are you sure you want to send the Research Guide Email & In-App Notification to all students? This will only message students who haven't received it yet, guaranteeing exactly one message per student!")) return;
+    setBlasting(true);
+    try {
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
+      const res = await fetch('/api/instructor/send-blast', {
+        headers: { 'x-user-id': userHeader }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        alert(data.message || "Blast completed successfully!");
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to trigger blast.");
+      }
+    } catch (e) {
+      alert("An error occurred while sending the blast.");
+    } finally {
+      setBlasting(false);
+    }
+  };
+
   return (
     <div className="container">
-      <header className="page-header">
-        <h1 className="title">Assessment & Feedback Portal</h1>
-        <p className="subtitle">Track pre/post test gains alongside student satisfaction and qualitative reviews.</p>
+      <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', marginBottom: '25px' }}>
+        <div>
+          <h1 className="title">Assessment & Feedback Portal</h1>
+          <p className="subtitle">Track pre/post test gains alongside student satisfaction and qualitative reviews.</p>
+        </div>
+        <button 
+          className="btn btn-primary" 
+          onClick={triggerBlast} 
+          disabled={blasting}
+          style={{
+            background: 'linear-gradient(135deg, #a855f7, #6366f1)',
+            border: 'none',
+            boxShadow: '0 4px 15px rgba(168, 85, 247, 0.35)',
+            fontWeight: '700',
+            padding: '12px 24px',
+            borderRadius: '12px',
+            cursor: blasting ? 'not-allowed' : 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          {blasting ? (
+            <><i className="fa-solid fa-spinner fa-spin"></i> Blasting...</>
+          ) : (
+            <><i className="fa-solid fa-bullhorn"></i> Send Research Blast</>
+          )}
+        </button>
       </header>
 
       {/* Navigation Tabs */}
