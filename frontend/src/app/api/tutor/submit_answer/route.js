@@ -124,7 +124,7 @@ export async function POST(req) {
         // Reset tracking counters for the difficulty level
         user[`total_at_current_diff_${topic}`] = 0;
         user[`wrong_at_current_diff_${topic}`] = 0;
-      } else if (user[`questions_since_last_upload_${topic}`] >= 5 && document_is_hard_enough(python_resp.mastery)) {
+      } else if (user[`questions_since_last_upload_${topic}`] >= 2 && document_is_hard_enough(python_resp.mastery)) {
          next_action = { 
            type: 'upload_work', 
            question_text: user[`current_action_${topic}`]?.content || 'Show your work.',
