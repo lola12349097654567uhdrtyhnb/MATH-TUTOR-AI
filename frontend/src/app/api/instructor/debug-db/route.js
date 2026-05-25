@@ -6,35 +6,58 @@ export async function GET(req) {
   try {
     await dbConnect();
     const db = mongoose.connection.db;
-    
-    // Find all users who have submitted the evaluation questionnaire
-    const surveySubmissions = await db.collection('users').find({
-      evaluation_questionnaire: { $exists: true, $ne: null }
-    }).project({ username: 1, role: 1, evaluation_questionnaire: 1 }).toArray();
 
-    // Find all student users who completed the post-assessment
-    const postAssessmentCompleters = await db.collection('users').find({
+    // Find all users who have post_assessment.completed = true in the users collection
+    const usersCompleted = await db.collection('users').find({
       role: 'student',
       'post_assessment.completed': true
-    }).project({ username: 1, email: 1, evaluation_questionnaire: 1 }).toArray();
+    }).project({ username: 1, 'post_assessment.score': 1 }).toArray();
 
-    // Filter those who did the post-test but forgot the survey
-    const forgotSurvey = postAssessmentCompleters.filter(s => !s.evaluation_questionnaire);
+    // Find all unique usernames in the activities collection who have answered a post-assessment question
+    const uniqueUsernamesWithPostActivities = await db.collection('activities').distinct('username', {
+      'details.is_assessment': true,
+      'details.assessment_type': 'post'
+    });
+
+    // Cross-reference: find any user who has post-assessment activities but post_assessment.completed is not true in the users collection
+    const discrepantUsers = [];
+    for (const username of uniqueUsernamesWithPostActivities) {
+      const user = await db.collection('users').findOne({ username });
+      if (!user) {
+        discrepantUsers.push({ username, reason: 'User record completely missing' });
+      } else if (!user.post_assessment || !user.post_assessment.completed) {
+        const count = await db.collection('activities').countDocuments({
+          username,
+          'details.is_assessment': true,
+          'details.assessment_type': 'post'
+        });
+        discrepantUsers.push({
+          username,
+          reason: 'User record says not completed, but has activities',
+          activitiesCount: count,
+          userPreCompleted: !!(user.pre_assessment && user.pre_assessment.completed)
+        });
+      }
+    }
+
+    // Find all student users who are active (pre-assessment completed)
+    const activeStudents = await db.collection('users').find({
+      role: 'student',
+      'pre_assessment.completed': true
+    }).project({ username: 1, 'post_assessment.completed': 1 }).toArray();
 
     return NextResponse.json({
       success: true,
-      surveySubmissionsCount: surveySubmissions.length,
-      surveySubmissions: surveySubmissions.map(s => ({
+      postAssessmentCompletedCount: usersCompleted.length,
+      postAssessmentCompletedUsers: usersCompleted.map(u => u.username),
+      uniqueUsernamesWithPostActivitiesCount: uniqueUsernamesWithPostActivities.length,
+      uniqueUsernamesWithPostActivities,
+      discrepancyCount: discrepantUsers.length,
+      discrepancies: discrepantUsers,
+      totalActiveStudents: activeStudents.length,
+      activeStudentsList: activeStudents.map(s => ({
         username: s.username,
-        role: s.role,
-        submitted_at: s.evaluation_questionnaire.submitted_at || null,
-        satisfaction: s.evaluation_questionnaire.satisfaction
-      })),
-      postAssessmentCompletersCount: postAssessmentCompleters.length,
-      forgotSurveyCount: forgotSurvey.length,
-      forgotSurvey: forgotSurvey.map(s => ({
-        username: s.username,
-        email: s.email || 'No email'
+        postCompleted: !!(s.post_assessment && s.post_assessment.completed)
       }))
     });
   } catch (error) {
