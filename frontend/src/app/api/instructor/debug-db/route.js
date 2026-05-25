@@ -6,59 +6,37 @@ export async function GET(req) {
   try {
     await dbConnect();
     const db = mongoose.connection.db;
+    
+    // Get all collection names
+    const collections = await db.listCollections().toArray();
+    const colNames = collections.map(c => c.name);
 
-    // Find all users who have post_assessment.completed = true in the users collection
-    const usersCompleted = await db.collection('users').find({
-      role: 'student',
-      'post_assessment.completed': true
-    }).project({ username: 1, 'post_assessment.score': 1 }).toArray();
+    // Get count of users
+    const usersCount = await db.collection('users').countDocuments();
+    const activitiesCount = await db.collection('activities').countDocuments();
 
-    // Find all unique usernames in the activities collection who have answered a post-assessment question
-    const uniqueUsernamesWithPostActivities = await db.collection('activities').distinct('username', {
-      'details.is_assessment': true,
-      'details.assessment_type': 'post'
-    });
+    // Find saja.sawy in the raw collection
+    const saja = await db.collection('users').findOne({ username: 'saja.sawy' });
 
-    // Cross-reference: find any user who has post-assessment activities but post_assessment.completed is not true in the users collection
-    const discrepantUsers = [];
-    for (const username of uniqueUsernamesWithPostActivities) {
-      const user = await db.collection('users').findOne({ username });
-      if (!user) {
-        discrepantUsers.push({ username, reason: 'User record completely missing' });
-      } else if (!user.post_assessment || !user.post_assessment.completed) {
-        const count = await db.collection('activities').countDocuments({
-          username,
-          'details.is_assessment': true,
-          'details.assessment_type': 'post'
-        });
-        discrepantUsers.push({
-          username,
-          reason: 'User record says not completed, but has activities',
-          activitiesCount: count,
-          userPreCompleted: !!(user.pre_assessment && user.pre_assessment.completed)
-        });
-      }
-    }
+    // Get all activities for saja.sawy
+    const sajaActivities = await db.collection('activities').find({ username: 'saja.sawy' }).toArray();
 
-    // Find all student users who are active (pre-assessment completed)
-    const activeStudents = await db.collection('users').find({
-      role: 'student',
-      'pre_assessment.completed': true
-    }).project({ username: 1, 'post_assessment.completed': 1 }).toArray();
+    // Query all upload_work activities in the database to see which students have uploaded photos
+    const allUploads = await db.collection('activities').find({ action: 'upload_work' }).project({ username: 1, topic: 1, createdAt: 1 }).toArray();
+
+    // Find a few other students to see
+    const otherStudents = await db.collection('users').find({ role: 'student' }).limit(5).toArray();
 
     return NextResponse.json({
       success: true,
-      postAssessmentCompletedCount: usersCompleted.length,
-      postAssessmentCompletedUsers: usersCompleted.map(u => u.username),
-      uniqueUsernamesWithPostActivitiesCount: uniqueUsernamesWithPostActivities.length,
-      uniqueUsernamesWithPostActivities,
-      discrepancyCount: discrepantUsers.length,
-      discrepancies: discrepantUsers,
-      totalActiveStudents: activeStudents.length,
-      activeStudentsList: activeStudents.map(s => ({
-        username: s.username,
-        postCompleted: !!(s.post_assessment && s.post_assessment.completed)
-      }))
+      collections: colNames,
+      usersCount,
+      activitiesCount,
+      sajaActivitiesCount: sajaActivities.length,
+      allUploadsCount: allUploads.length,
+      sajaActivities,
+      saja: saja || null,
+      otherStudents: otherStudents.map(s => ({ username: s.username, role: s.role }))
     });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
