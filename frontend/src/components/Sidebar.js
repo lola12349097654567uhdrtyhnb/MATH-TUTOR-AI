@@ -12,7 +12,10 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
 
   useEffect(() => {
     async function fetchSession() {
-      const res = await fetch('/api/auth/session');
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
+      const res = await fetch('/api/auth/session', {
+        headers: { 'x-user-id': userHeader }
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.role) {

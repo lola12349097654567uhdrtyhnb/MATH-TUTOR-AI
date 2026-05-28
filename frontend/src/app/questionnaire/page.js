@@ -18,7 +18,10 @@ export default function Questionnaire() {
 
   useEffect(() => {
     async function checkRole() {
-      const sesh = await fetch('/api/auth/session');
+      const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
+      const sesh = await fetch('/api/auth/session', {
+        headers: { 'x-user-id': userHeader }
+      });
       if (sesh.ok) {
         const seshData = await sesh.json();
         if (seshData.role === 'instructor') {

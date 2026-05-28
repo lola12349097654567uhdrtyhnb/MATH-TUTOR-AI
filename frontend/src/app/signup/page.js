@@ -6,6 +6,7 @@ import Link from 'next/link';
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
   const [role, setRole] = useState('student');
   const [error, setError] = useState(null);
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function Signup() {
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role })
+      body: JSON.stringify({ email, password, role, phone })
     });
     const data = await res.json();
     if (res.ok) {
@@ -45,6 +46,11 @@ export default function Signup() {
             <div className="form-group" style={{marginBottom: '16px'}}>
               <label>Password</label>
               <input type="password" placeholder="Choose a secure password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            </div>
+
+            <div className="form-group" style={{marginBottom: '16px'}}>
+              <label>Phone Number <span style={{color: 'var(--muted)', fontSize: '0.8rem', fontWeight: 'normal'}}>(Optional - Yours or parent's)</span></label>
+              <input type="text" placeholder="Enter phone number (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
 
             <div className="form-group" style={{marginBottom: '32px', padding: '16px', background: 'rgba(139, 92, 246, 0.05)', borderRadius: '16px', border: '1px solid rgba(139, 92, 246, 0.1)'}}>

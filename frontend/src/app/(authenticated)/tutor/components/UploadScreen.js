@@ -190,7 +190,11 @@ export function UploadScreen({
               width: '100%',
               height: '100%',
               display: 'block',
-              borderRadius: '12px'
+              borderRadius: '12px',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              MozUserSelect: 'none',
+              msUserSelect: 'none'
             }}
             onPointerDown={startDrawing}
             onPointerMove={draw}
@@ -320,7 +324,11 @@ export function UploadScreen({
                   cursor: 'crosshair',
                   width: '100%',
                   height: 'auto',
-                  display: 'block'
+                  display: 'block',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none'
                 }}
                 onPointerDown={startDrawing}
                 onPointerMove={draw}

@@ -5,7 +5,7 @@ import User from '@/lib/models/User';
 export async function POST(req) {
   try {
     await dbConnect();
-    const { email, password, role } = await req.json();
+    const { email, password, role, phone } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
@@ -29,7 +29,8 @@ export async function POST(req) {
       username,
       email,
       password_hash: password,
-      role: role || 'student'
+      role: role || 'student',
+      phone: phone || ''
     });
 
     await newUser.save();

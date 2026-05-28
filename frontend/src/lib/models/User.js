@@ -5,6 +5,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, unique: true, sparse: true },
   password_hash: { type: String, required: true },
   role: { type: String, enum: ['student', 'instructor'], default: 'student' },
+  phone: { type: String, default: "" },
   profile_configured: { type: Boolean, default: false },
   learning_profile: { type: mongoose.Schema.Types.Mixed, default: {} },
   notifications: [{
