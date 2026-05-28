@@ -1,42 +1,137 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import mongoose from 'mongoose';
+import path from 'path';
+import fs from 'fs';
+import Question from '@/lib/models/Question';
 
 export async function GET(req) {
   try {
     await dbConnect();
     const db = mongoose.connection.db;
-    
-    // Get all collection names
-    const collections = await db.listCollections().toArray();
-    const colNames = collections.map(c => c.name);
 
-    // Get count of users
-    const usersCount = await db.collection('users').countDocuments();
-    const activitiesCount = await db.collection('activities').countDocuments();
+    const anomalies = [];
 
-    // Find saja.sawy in the raw collection
-    const saja = await db.collection('users').findOne({ username: 'saja.sawy' });
+    // Helper function to audit questions array
+    const auditQuestions = (questionsArray, sourceName) => {
+      let count = 0;
+      questionsArray.forEach((q, idx) => {
+        const qid = q.id || `${sourceName}_index_${idx}`;
+        const content = q.content || '(no content)';
+        const correct = q.correct_answer;
+        const opts = q.options || q.answers || [];
 
-    // Get all activities for saja.sawy
-    const sajaActivities = await db.collection('activities').find({ username: 'saja.sawy' }).toArray();
+        if (correct === undefined || correct === null) {
+          anomalies.push({
+            id: qid,
+            source: sourceName,
+            error: 'correct_answer field is missing entirely',
+            content
+          });
+          count++;
+          return;
+        }
 
-    // Query all upload_work activities in the database to see which students have uploaded photos
-    const allUploads = await db.collection('activities').find({ action: 'upload_work' }).project({ username: 1, topic: 1, createdAt: 1 }).toArray();
+        if (String(correct).strip ? String(correct).trim() === '' : String(correct) === '') {
+          anomalies.push({
+            id: qid,
+            source: sourceName,
+            error: 'correct_answer is an empty or blank string',
+            content
+          });
+          count++;
+          return;
+        }
 
-    // Find a few other students to see
-    const otherStudents = await db.collection('users').find({ role: 'student' }).limit(5).toArray();
+        if (!opts || opts.length === 0) {
+          anomalies.push({
+            id: qid,
+            source: sourceName,
+            error: 'options array is empty or missing',
+            content
+          });
+          count++;
+          return;
+        }
+
+        // Clean values for comparison
+        const cleanCorrect = String(correct).trim().toLowerCase();
+        const cleanOpts = opts.map(o => String(o).trim().toLowerCase());
+
+        if (!opts.includes(correct)) {
+          if (cleanOpts.includes(cleanCorrect)) {
+            anomalies.push({
+              id: qid,
+              source: sourceName,
+              error: `correct_answer '${correct}' has a whitespace or casing mismatch with options: [${opts.join(', ')}]`,
+              content
+            });
+            count++;
+          } else {
+            anomalies.push({
+              id: qid,
+              source: sourceName,
+              error: `correct_answer '${correct}' does not exist in options: [${opts.join(', ')}]`,
+              content
+            });
+            count++;
+          }
+        }
+      });
+      return count;
+    };
+
+    // 1. Audit assessment_questions.json
+    let assessmentCount = 0;
+    let assessmentAnomalies = 0;
+    try {
+      const aPath = path.join(process.cwd(), '../assessment_questions.json');
+      if (fs.existsSync(aPath)) {
+        const data = JSON.parse(fs.readFileSync(aPath, 'utf8'));
+        assessmentCount = data.length;
+        assessmentAnomalies = auditQuestions(data, 'assessment_questions.json');
+      }
+    } catch (e) {
+      anomalies.push({ source: 'assessment_questions.json', error: `File load/parse error: ${e.message}` });
+    }
+
+    // 2. Audit questions.json (Practice Bank)
+    let practiceCount = 0;
+    let practiceAnomalies = 0;
+    try {
+      const pPath = path.join(process.cwd(), '../questions.json');
+      if (fs.existsSync(pPath)) {
+        const data = JSON.parse(fs.readFileSync(pPath, 'utf8'));
+        practiceCount = data.length;
+        practiceAnomalies = auditQuestions(data, 'questions.json');
+      }
+    } catch (e) {
+      anomalies.push({ source: 'questions.json', error: `File load/parse error: ${e.message}` });
+    }
+
+    // 3. Audit production MongoDB questions collection
+    let dbCount = 0;
+    let dbAnomalies = 0;
+    try {
+      const dbQs = await Question.find({}).lean();
+      dbCount = dbQs.length;
+      dbAnomalies = auditQuestions(dbQs, 'MongoDB questions collection');
+    } catch (e) {
+      anomalies.push({ source: 'MongoDB questions collection', error: `DB query error: ${e.message}` });
+    }
 
     return NextResponse.json({
       success: true,
-      collections: colNames,
-      usersCount,
-      activitiesCount,
-      sajaActivitiesCount: sajaActivities.length,
-      allUploadsCount: allUploads.length,
-      sajaActivities,
-      saja: saja || null,
-      otherStudents: otherStudents.map(s => ({ username: s.username, role: s.role }))
+      summary: {
+        assessment_questions_loaded: assessmentCount,
+        assessment_questions_anomalies: assessmentAnomalies,
+        practice_questions_loaded: practiceCount,
+        practice_questions_anomalies: practiceAnomalies,
+        mongodb_questions_loaded: dbCount,
+        mongodb_questions_anomalies: dbAnomalies,
+        total_anomalies_found: anomalies.length
+      },
+      anomalies
     });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
