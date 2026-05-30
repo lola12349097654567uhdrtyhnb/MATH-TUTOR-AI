@@ -11,6 +11,7 @@ export function UploadScreen({
   isActive
 }) {
   const [uploadMode, setUploadMode] = useState('camera');
+  const [typedWork, setTypedWork] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -112,8 +113,14 @@ export function UploadScreen({
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-    let fileToUpload = null;
     
+    if (uploadMode === 'typed') {
+      setIsFullscreen(false);
+      submitUpload(typedWork, true, false);
+      return;
+    }
+
+    let fileToUpload = null;
     if (uploadMode === 'camera') {
       const rawFile = e.target.elements?.file?.files?.[0];
       if (rawFile) {
@@ -128,7 +135,12 @@ export function UploadScreen({
     }
     
     setIsFullscreen(false);
-    submitUpload(fileToUpload);
+    submitUpload(fileToUpload, false, false);
+  };
+
+  const handleSkip = () => {
+    setIsFullscreen(false);
+    submitUpload('', false, true);
   };
 
   // Fullscreen Modal rendered via React Portal
@@ -287,17 +299,20 @@ export function UploadScreen({
         </ul>
       </div>
 
-      <div style={{display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px'}}>
-        <button className={`btn ${uploadMode === 'camera' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setUploadMode('camera')}>
+      <div style={{display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px', flexWrap: 'wrap'}}>
+        <button type="button" className={`btn ${uploadMode === 'camera' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setUploadMode('camera')}>
           <i className="fa-solid fa-camera"></i> Take Photo
         </button>
-        <button className={`btn ${uploadMode === 'whiteboard' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setUploadMode('whiteboard')}>
+        <button type="button" className={`btn ${uploadMode === 'whiteboard' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setUploadMode('whiteboard')}>
           <i className="fa-solid fa-pen-nib"></i> Draw on Screen
+        </button>
+        <button type="button" className={`btn ${uploadMode === 'typed' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setUploadMode('typed')}>
+          <i className="fa-solid fa-keyboard"></i> Type Steps
         </button>
       </div>
 
       <form onSubmit={handleSubmit}>
-        {uploadMode === 'camera' ? (
+        {uploadMode === 'camera' && (
           <>
             <input type="file" name="file" accept="image/*" capture="environment" style={{display: 'block', margin: '0 auto 20px'}} required />
             {feedback.text && <p className={`status show ${feedback.type}`}>{feedback.text}</p>}
@@ -305,7 +320,9 @@ export function UploadScreen({
               <button type="submit" className="btn btn-primary"><i className="fa-solid fa-cloud-arrow-up"></i> Upload to AI Grader</button>
             </div>
           </>
-        ) : (
+        )}
+
+        {uploadMode === 'whiteboard' && (
           <div style={{ marginBottom: '20px', position: 'relative' }}>
             <div style={{
               width: '100%',
@@ -391,7 +408,43 @@ export function UploadScreen({
             </div>
           </div>
         )}
+
+        {uploadMode === 'typed' && (
+          <div style={{ marginBottom: '20px', textAlign: 'left' }}>
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', fontSize: '0.95rem', color: '#9ca3af' }}>Type your step-by-step math calculations:</label>
+            <textarea 
+              placeholder="Type your steps here... (e.g. 5/6 * (2/3 + 1/4) = 5/6 * 11/12 = 55/72)" 
+              required
+              rows={4}
+              style={{
+                width: '100%',
+                background: 'rgba(0, 0, 0, 0.25)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '12px',
+                padding: '15px',
+                color: '#fff',
+                fontSize: '1rem',
+                outline: 'none',
+                resize: 'none',
+                fontFamily: 'inherit',
+                marginBottom: '15px'
+              }}
+              value={typedWork}
+              onChange={(e) => setTypedWork(e.target.value)}
+            />
+            {feedback.text && <p className={`status show ${feedback.type}`} style={{marginTop: '15px'}}>{feedback.text}</p>}
+            <div className="actions" style={{justifyContent: 'center'}}>
+              <button type="submit" className="btn btn-primary"><i className="fa-solid fa-cloud-arrow-up"></i> Upload to AI Grader</button>
+            </div>
+          </div>
+        )}
       </form>
+
+      <div style={{ marginTop: '30px', borderTop: '1px solid var(--border)', paddingTop: '20px', display: 'flex', justifyContent: 'center' }}>
+        <button type="button" className="btn btn-secondary" onClick={handleSkip} style={{ fontSize: '0.9rem', color: 'var(--warn-text)', border: '1px dashed rgba(245,158,11,0.3)', padding: '10px 20px' }}>
+          <i className="fa-solid fa-forward"></i> Skip AI Grading (Does not affect mastery)
+        </button>
+      </div>
     </section>
   );
 }

@@ -24,6 +24,8 @@ export async function POST(req) {
     const topic = formData.get('topic');
     const question_text = formData.get('question_text');
     const file = formData.get('file');
+    const isSkipped = formData.get('is_skipped') === 'true';
+    const isTextWork = formData.get('is_text_work') === 'true';
 
     const cookieStore = await cookies();
     const sessionUser = req.headers.get('x-user-id') || cookieStore.get('session_user')?.value;
@@ -36,38 +38,62 @@ export async function POST(req) {
       [`brain_state_${topic}`]: user[`brain_state_${topic}`] || {}
     };
 
-    // Convert File to Base64
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64_image = buffer.toString('base64');
+    let python_resp;
+    let base64_image = null;
 
-    const pyReq = await fetch(`${process.env.PYTHON_API_URL}/api/upload_work`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ base64_image, question_text, topic, user_data })
-    });
-    const python_resp = await pyReq.json();
+    if (isSkipped) {
+      python_resp = {
+        is_valid_math: true,
+        feedback: "Skipped showing work. Keep practicing!",
+        brain_state: user[`brain_state_${topic}`] || { belief: 0.1 }
+      };
+    } else if (isTextWork) {
+      const typed_work = formData.get('typed_work');
+      const pyReq = await fetch(`${process.env.PYTHON_API_URL}/api/upload_work`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_text_work: true, typed_work, question_text, topic, user_data })
+      });
+      python_resp = await pyReq.json();
+    } else {
+      // Convert File to Base64
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      base64_image = buffer.toString('base64');
+
+      const pyReq = await fetch(`${process.env.PYTHON_API_URL}/api/upload_work`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ base64_image, question_text, topic, user_data })
+      });
+      python_resp = await pyReq.json();
+    }
     
     user[`brain_state_${topic}`] = python_resp.brain_state;
     user[`questions_since_last_upload_${topic}`] = 0; // reset
     
-    if (python_resp.is_valid_math) {
-      const orig = user[`current_action_${topic}`]?.original_question_id || '';
-      if (orig.includes('_master_')) {
-          user[`master_validations_${topic}`] = (user[`master_validations_${topic}`] || 0) + 1;
+    if (!isSkipped) {
+      if (python_resp.is_valid_math) {
+        const orig = user[`current_action_${topic}`]?.original_question_id || '';
+        if (orig.includes('_master_')) {
+            user[`master_validations_${topic}`] = (user[`master_validations_${topic}`] || 0) + 1;
+        }
+      } else {
+        user[`mastery_streak_${topic}`] = 0; // reset MCQ streak on failed upload
       }
-    } else {
-      user[`mastery_streak_${topic}`] = 0; // reset MCQ streak on failed upload
     }
     
-    // Log activity with image trace strictly requested by user
+    // Log activity
     await Activity.create({
       username: sessionUser,
       topic,
-      action: 'upload_work',
+      action: isSkipped ? 'skip_upload' : 'upload_work',
       details: {
         is_valid_math: python_resp.is_valid_math,
-        image_trace: `data:${file.type || 'image/png'};base64,${base64_image}`,
+        is_skipped: isSkipped,
+        is_text_work: isTextWork,
+        typed_work: isTextWork ? formData.get('typed_work') : undefined,
+        image_trace: isSkipped || isTextWork ? undefined : `data:${file?.type || 'image/png'};base64,${base64_image}`,
         original_question_id: user[`current_action_${topic}`]?.original_question_id || user[`current_action_${topic}`]?.id,
         original_question_text: user[`current_action_${topic}`]?.question_text || user[`current_action_${topic}`]?.content || 'Upload scratchpad question.',
         student_guess: user[`current_action_${topic}`]?.student_guess || 'N/A',
@@ -101,11 +127,10 @@ export async function POST(req) {
 
     await user.save();
 
-    let final_video_url = null;
-
     return NextResponse.json({
       is_valid_math: python_resp.is_valid_math,
-      message: python_resp.is_valid_math ? "Excellent work! Math checks out." : python_resp.feedback || "Your scratchpad math didn't properly compute! Please review the topic concept review before continuing.",
+      is_skipped: isSkipped,
+      message: isSkipped ? "Skipped showing work. Keep practicing!" : (python_resp.is_valid_math ? "Excellent work! Math checks out." : python_resp.feedback || "Your scratchpad math didn't properly compute! Please review the topic concept review before continuing."),
       mastery: Math.round(python_resp.brain_state.belief * 100) / 100,
       video_url: null,
       next_action,

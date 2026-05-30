@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from tutor import BKTPomdpBrain
-from ai_grader import grade_scratchpad
+from ai_grader import grade_scratchpad, grade_typed_work
 from dotenv import load_dotenv
 import os
 
@@ -131,22 +131,28 @@ def get_hint():
 @limiter.limit("5 per minute")
 def upload_work():
     data = request.json or {}
-    base64_string = data.get('base64_image')
+    is_text_work = data.get('is_text_work', False)
     question_text = data.get('question_text', 'Fraction problem')
     user_data = data.get('user_data', {})
     topic = data.get('topic', 'fractions')
 
-    if not base64_string:
-        return jsonify({'error': 'No image provided'}), 400
+    if is_text_work:
+        typed_work = data.get('typed_work', '')
+        grade_result = grade_typed_work(typed_work, question_text, topic)
+    else:
+        base64_string = data.get('base64_image')
+        if not base64_string:
+            return jsonify({'error': 'No image provided'}), 400
+        grade_result = grade_scratchpad(base64_string, question_text, topic)
 
-    grade_result = grade_scratchpad(base64_string, question_text, topic)
     is_valid_math = grade_result.get("is_valid", False)
     
     brain = load_brain_from_user_state(user_data, topic)
     if is_valid_math:
         brain.belief = min(brain.belief + 0.10, 0.99)
     else:
-        brain.belief = max(brain.belief - 0.35, 0.01)
+        # Do not deduct! Keep mastery level exactly unchanged as requested.
+        pass
 
     return jsonify({
         'is_valid_math': is_valid_math,

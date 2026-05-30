@@ -224,14 +224,22 @@ export function useTutorEngine(topic, router) {
     }
   };
 
-  const submitUpload = async (fileToUpload) => {
-    if (!fileToUpload) return;
-    setFeedback({ text: 'Grading...', type: '' });
+  const submitUpload = async (fileOrText, isText = false, isSkipped = false) => {
+    setFeedback({ text: isSkipped ? 'Skipping...' : 'Grading...', type: '' });
     
     const formData = new FormData();
     formData.append('topic', topic);
-    formData.append('file', fileToUpload);
     formData.append('question_text', currentAction.question_text);
+
+    if (isSkipped) {
+      formData.append('is_skipped', 'true');
+    } else if (isText) {
+      formData.append('is_text_work', 'true');
+      formData.append('typed_work', fileOrText);
+    } else {
+      if (!fileOrText) return;
+      formData.append('file', fileOrText);
+    }
 
     const userHeader = typeof window !== 'undefined' ? localStorage.getItem('session_user') || '' : '';
     
