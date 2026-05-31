@@ -43,6 +43,7 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
 
   const instructorLinks = [
     { name: 'Class Overview', path: '/instructor/overview', icon: 'fa-solid fa-chalkboard-user' },
+    { name: 'Mastery Analytics', path: '/instructor/mastery-analytics', icon: 'fa-solid fa-chart-line' },
     { name: 'Assessment Results', path: '/instructor/assessments', icon: 'fa-solid fa-square-poll-vertical' },
     { name: 'Student Reviews', path: '/instructor/review', icon: 'fa-solid fa-magnifying-glass-chart' },
     { name: 'Question Bank', path: '/instructor/questions', icon: 'fa-solid fa-database' },
