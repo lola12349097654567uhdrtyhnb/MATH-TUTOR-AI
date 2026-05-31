@@ -12,6 +12,7 @@ export default function MasteryAnalytics() {
   // Advanced Cohort Multi-Select and Date Filters
   const [selectedDate, setSelectedDate] = useState('all'); // 'all', 'today', 'tomorrow', or specific YYYY-MM-DD
   const [selectedGrade, setSelectedGrade] = useState('all'); // 'all', '7', '8'
+  const [selectedPostAssessment, setSelectedPostAssessment] = useState('all'); // 'all', 'completed', 'pending'
   const [selectedStudents, setSelectedStudents] = useState([]); // Array of usernames
   const [studentSearch, setStudentSearch] = useState('');
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
@@ -66,8 +67,15 @@ export default function MasteryAnalytics() {
     return s.grade === selectedGrade;
   });
 
+  // Filter by post-assessment status
+  const postAssessmentFilteredStudents = gradeFilteredStudents.filter(s => {
+    if (selectedPostAssessment === 'all') return true;
+    if (selectedPostAssessment === 'completed') return s.post_assessment_completed;
+    return !s.post_assessment_completed;
+  });
+
   // Further narrow down by chosen students (checkboxes)
-  const finalFilteredStudents = gradeFilteredStudents.filter(s => 
+  const finalFilteredStudents = postAssessmentFilteredStudents.filter(s => 
     selectedStudents.includes(s.username)
   );
 
@@ -266,12 +274,12 @@ export default function MasteryAnalytics() {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', alignItems: 'center' }}>
             {/* Login / Active Date Filter */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Login/Activity Date</label>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Login/Activity Date</label>
               <select 
                 value={selectedDate} 
                 onChange={(e) => {
                   setSelectedDate(e.target.value);
-                  // Dynamic behavior: When date changes, auto-select all students in that day's cohort
+                  // Dynamic behavior: When date changes, auto-select all students in that day's cohort matching current grade and post filter
                   let filteredByDate = [];
                   if (e.target.value === 'all') {
                     filteredByDate = students;
@@ -284,23 +292,35 @@ export default function MasteryAnalytics() {
                     }
                     filteredByDate = students.filter(s => s.active_dates && s.active_dates.includes(targetDateStr));
                   }
-                  setSelectedStudents(filteredByDate.map(s => s.username));
+                  
+                  const newlyFilteredByGrade = filteredByDate.filter(s => {
+                    if (selectedGrade === 'all') return true;
+                    return s.grade === selectedGrade;
+                  });
+                  const newlyFilteredByPost = newlyFilteredByGrade.filter(s => {
+                    if (selectedPostAssessment === 'all') return true;
+                    if (selectedPostAssessment === 'completed') return s.post_assessment_completed;
+                    return !s.post_assessment_completed;
+                  });
+                  setSelectedStudents(newlyFilteredByPost.map(s => s.username));
                 }} 
                 style={{ 
-                  width: '220px', 
-                  padding: '8px 12px', 
+                  width: '210px', 
+                  padding: '10px 16px', 
                   borderRadius: '10px', 
                   fontSize: '0.85rem',
-                  background: 'rgba(0, 0, 0, 0.2)',
-                  color: '#fff',
-                  border: '1px solid var(--border)',
+                  background: '#1e293b',
+                  color: '#ffffff',
+                  border: '1.5px solid rgba(139, 92, 246, 0.5)',
+                  fontWeight: '600',
                   outline: 'none',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
                 }}
               >
                 <option value="all">📅 All Activity Dates</option>
                 <option value="today">📅 Active Today</option>
-                <option value="tomorrow">📅 Active Tomorrow (Testing)</option>
+                <option value="tomorrow">📅 Active Tomorrow</option>
                 {uniqueDates.map(date => (
                   <option key={date} value={date}>📅 {date}</option>
                 ))}
@@ -309,12 +329,11 @@ export default function MasteryAnalytics() {
 
             {/* Grade Level Filter */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Grade Level</label>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Grade Level</label>
               <select 
                 value={selectedGrade} 
                 onChange={(e) => {
                   setSelectedGrade(e.target.value);
-                  // Dynamic behavior: When grade changes, auto-select all students in that day's cohort matching the new grade
                   let filteredByDate = [];
                   if (selectedDate === 'all') {
                     filteredByDate = students;
@@ -327,22 +346,30 @@ export default function MasteryAnalytics() {
                     }
                     filteredByDate = students.filter(s => s.active_dates && s.active_dates.includes(targetDateStr));
                   }
+                  
                   const newlyFilteredByGrade = filteredByDate.filter(s => {
                     if (e.target.value === 'all') return true;
                     return s.grade === e.target.value;
                   });
-                  setSelectedStudents(newlyFilteredByGrade.map(s => s.username));
+                  const newlyFilteredByPost = newlyFilteredByGrade.filter(s => {
+                    if (selectedPostAssessment === 'all') return true;
+                    if (selectedPostAssessment === 'completed') return s.post_assessment_completed;
+                    return !s.post_assessment_completed;
+                  });
+                  setSelectedStudents(newlyFilteredByPost.map(s => s.username));
                 }} 
                 style={{ 
-                  width: '150px', 
-                  padding: '8px 12px', 
+                  width: '140px', 
+                  padding: '10px 16px', 
                   borderRadius: '10px', 
                   fontSize: '0.85rem',
-                  background: 'rgba(0, 0, 0, 0.2)',
-                  color: '#fff',
-                  border: '1px solid var(--border)',
+                  background: '#1e293b',
+                  color: '#ffffff',
+                  border: '1.5px solid rgba(139, 92, 246, 0.5)',
+                  fontWeight: '600',
                   outline: 'none',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
                 }}
               >
                 <option value="all">🎓 All Grades</option>
@@ -351,32 +378,85 @@ export default function MasteryAnalytics() {
               </select>
             </div>
 
+            {/* Post-Assessment Status Filter */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Post-Assessment</label>
+              <select 
+                value={selectedPostAssessment} 
+                onChange={(e) => {
+                  setSelectedPostAssessment(e.target.value);
+                  let filteredByDate = [];
+                  if (selectedDate === 'all') {
+                    filteredByDate = students;
+                  } else {
+                    let targetDateStr = selectedDate;
+                    if (selectedDate === 'today') {
+                      targetDateStr = new Date().toISOString().split('T')[0];
+                    } else if (selectedDate === 'tomorrow') {
+                      targetDateStr = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                    }
+                    filteredByDate = students.filter(s => s.active_dates && s.active_dates.includes(targetDateStr));
+                  }
+                  
+                  const newlyFilteredByGrade = filteredByDate.filter(s => {
+                    if (selectedGrade === 'all') return true;
+                    return s.grade === selectedGrade;
+                  });
+                  const newlyFilteredByPost = newlyFilteredByGrade.filter(s => {
+                    if (e.target.value === 'all') return true;
+                    if (e.target.value === 'completed') return s.post_assessment_completed;
+                    return !s.post_assessment_completed;
+                  });
+                  setSelectedStudents(newlyFilteredByPost.map(s => s.username));
+                }} 
+                style={{ 
+                  width: '180px', 
+                  padding: '10px 16px', 
+                  borderRadius: '10px', 
+                  fontSize: '0.85rem',
+                  background: '#1e293b',
+                  color: '#ffffff',
+                  border: '1.5px solid rgba(139, 92, 246, 0.5)',
+                  fontWeight: '600',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                }}
+              >
+                <option value="all">📝 All Students</option>
+                <option value="completed">📝 Completed Only</option>
+                <option value="pending">📝 Pending Only</option>
+              </select>
+            </div>
+
             {/* Student Selector Multi-Select Dropdown */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', position: 'relative' }}>
-              <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Select Target Students</label>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Select Target Students</label>
               <button 
                 type="button"
                 onClick={() => setShowStudentDropdown(!showStudentDropdown)}
                 className="btn btn-secondary"
                 style={{ 
-                  width: '240px', 
+                  width: '230px', 
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center', 
-                  padding: '8px 12px', 
+                  padding: '10px 16px', 
                   fontSize: '0.85rem',
                   borderRadius: '10px',
-                  background: 'rgba(0,0,0,0.2)',
-                  border: '1px solid var(--border)',
-                  color: '#fff',
-                  cursor: 'pointer'
+                  background: '#1e293b',
+                  border: '1.5px solid rgba(139, 92, 246, 0.5)',
+                  color: '#ffffff',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
                 }}
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <i className="fa-solid fa-users" style={{ color: 'var(--primary)' }}></i>
-                  {selectedStudents.length === gradeFilteredStudents.length 
+                  {selectedStudents.length === postAssessmentFilteredStudents.length 
                     ? 'All Cohort Selected' 
-                    : `Selected: ${selectedStudents.length} / ${gradeFilteredStudents.length}`}
+                    : `Selected: ${selectedStudents.length} / ${postAssessmentFilteredStudents.length}`}
                 </span>
                 <i className={`fa-solid fa-chevron-${showStudentDropdown ? 'up' : 'down'}`} style={{ fontSize: '0.75rem', opacity: 0.7 }}></i>
               </button>
@@ -426,7 +506,7 @@ export default function MasteryAnalytics() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '0 2px' }}>
                       <button 
                         type="button"
-                        onClick={() => setSelectedStudents(gradeFilteredStudents.map(s => s.username))}
+                        onClick={() => setSelectedStudents(postAssessmentFilteredStudents.map(s => s.username))}
                         style={{ fontSize: '0.75rem', background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', padding: 0 }}
                       >
                         Select All Cohort
@@ -449,12 +529,12 @@ export default function MasteryAnalytics() {
                       gap: '4px',
                       paddingTop: '4px'
                     }}>
-                      {gradeFilteredStudents.length === 0 ? (
+                      {postAssessmentFilteredStudents.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '10px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>
                           No active students found for this cohort.
                         </div>
                       ) : (
-                        gradeFilteredStudents
+                        postAssessmentFilteredStudents
                           .filter(s => s.username.toLowerCase().includes(studentSearch.toLowerCase()))
                           .map(s => {
                             const isChecked = selectedStudents.includes(s.username);
