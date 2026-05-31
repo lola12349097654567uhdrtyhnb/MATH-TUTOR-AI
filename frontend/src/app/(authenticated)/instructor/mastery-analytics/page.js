@@ -635,7 +635,7 @@ export default function MasteryAnalytics() {
 
           {/* Interactive SVG Plot */}
           <div style={{ width: '100%', overflowX: 'auto', background: 'rgba(0,0,0,0.15)', borderRadius: '16px', border: '1px solid var(--border)', padding: '15px' }}>
-            <div style={{ minWidth: '600px', width: '100%' }}>
+            <div style={{ minWidth: '480px', width: '100%' }}>
               <svg 
                 viewBox={`0 0 ${width} ${height}`} 
                 width="100%" 
@@ -956,7 +956,7 @@ export default function MasteryAnalytics() {
           from { opacity: 0; transform: translateY(5px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @media (max-width: 1100px) {
+        @media (max-width: 1200px) {
           .responsive-column-grid {
             grid-template-columns: 1fr !important;
           }
