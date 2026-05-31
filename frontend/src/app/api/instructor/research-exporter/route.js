@@ -95,6 +95,33 @@ export async function GET(req) {
         ? Math.round((successfulInterventions / scaffoldCount) * 100)
         : null;
 
+      // Calculate active hours using sessionization (15 mins threshold)
+      let activeHours = 0;
+      if (studentActs.length > 0) {
+        const sorted = studentActs
+          .map(a => new Date(a.createdAt).getTime())
+          .sort((a, b) => a - b);
+        
+        let totalTimeMs = 0;
+        let currentSessionStart = sorted[0];
+        let currentSessionLast = sorted[0];
+        const SESSION_THRESHOLD_MS = 15 * 60 * 1000;
+        
+        for (let i = 1; i < sorted.length; i++) {
+          if (sorted[i] - currentSessionLast < SESSION_THRESHOLD_MS) {
+            currentSessionLast = sorted[i];
+          } else {
+            totalTimeMs += Math.max(currentSessionLast - currentSessionStart, 60 * 1000);
+            currentSessionStart = sorted[i];
+            currentSessionLast = sorted[i];
+          }
+        }
+        totalTimeMs += Math.max(currentSessionLast - currentSessionStart, 60 * 1000);
+        activeHours = Math.round((totalTimeMs / (1000 * 60 * 60)) * 100) / 100;
+      }
+
+      const questionsAnswered = studentActs.filter(a => a.action === 'answer_question' || a.action === 'upload_work').length;
+
       return {
         username: student.username,
         grade: student.grade || 'N/A',
@@ -107,13 +134,17 @@ export async function GET(req) {
         difficulty_trajectory: difficultyCounts,
         scaffold_count: scaffoldCount,
         post_intervention_success_rate: interventionSuccessRate,
+        active_hours: activeHours,
+        questions_answered: questionsAnswered,
         last_active: student.updatedAt
       };
     });
 
     // Calculate Cohort Cohort Summary Statistics
     const computeCohortStats = (cohortName) => {
-      const cohortCohort = dataset.filter(s => s.cohort === cohortName);
+      // Exclude students who are inactive (answered 0 questions OR active for less than 0.3 hours)
+      const activeDataset = dataset.filter(s => s.questions_answered > 0 && s.active_hours >= 0.3);
+      const cohortCohort = activeDataset.filter(s => s.cohort === cohortName);
       const validGains = cohortCohort.filter(s => s.learning_gain !== null);
       
       const avgGain = validGains.length > 0

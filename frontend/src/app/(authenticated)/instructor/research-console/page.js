@@ -74,7 +74,9 @@ export default function ResearchConsole() {
       'Post-Intervention Success Rate (%)'
     ];
 
-    const rows = data.students.map(s => [
+    const activeStudentsForExport = data.students.filter(s => s.questions_answered > 0 && s.active_hours >= 0.3);
+
+    const rows = activeStudentsForExport.map(s => [
       s.username,
       s.grade,
       s.cohort === 'A' ? 'Cohort A (Supervised)' : (s.cohort === 'B' ? 'Cohort B (Remote)' : 'Unassigned'),
@@ -112,8 +114,12 @@ export default function ResearchConsole() {
 
   const studentsList = data?.students || [];
   
+  // Split active and inactive students (Active study cohort: questions > 0 AND active hours >= 0.3)
+  const activeStudents = studentsList.filter(s => s.questions_answered > 0 && s.active_hours >= 0.3);
+  const inactiveStudents = studentsList.filter(s => s.questions_answered === 0 || s.active_hours < 0.3);
+
   // Filter students display
-  const filteredStudents = studentsList.filter(s => {
+  const filteredStudents = activeStudents.filter(s => {
     if (selectedCohortFilter === 'all') return true;
     if (selectedCohortFilter === 'A') return s.cohort === 'A';
     if (selectedCohortFilter === 'B') return s.cohort === 'B';
@@ -408,6 +414,78 @@ export default function ResearchConsole() {
                           Ma:{stu.difficulty_trajectory.master}
                         </span>
                       </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Excluded Cohort / Inactive Students Card */}
+      <div className="card" style={{ 
+        marginBottom: '30px', 
+        padding: '30px', 
+        border: '1.5px solid rgba(239, 68, 68, 0.25)', 
+        background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.02), rgba(20, 24, 45, 0.45))' 
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+          <div>
+            <h2 className="section-title" style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontSize: '1.25rem' }}>
+              <i className="fa-solid fa-triangle-exclamation"></i> Excluded Cohort: Insufficient Activity for Testing
+            </h2>
+            <p className="section-note" style={{ margin: '5px 0 0', color: 'var(--muted)', fontSize: '0.85rem' }}>
+              Students who registered but answered 0 questions or practiced for less than 0.3 hours. Excluded from primary learning metrics & empirical datasets.
+            </p>
+          </div>
+          <span style={{ fontSize: '0.85rem', color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)', padding: '6px 12px', borderRadius: '20px', fontWeight: 'bold' }}>
+            {inactiveStudents.length} Excluded Students
+          </span>
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '950px' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--text)' }}>
+                <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700' }}>STUDENT NAME</th>
+                <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>GRADE</th>
+                <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>ACTIVE HOURS</th>
+                <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>QUESTIONS</th>
+                <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>PRE</th>
+                <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>POST</th>
+                <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>EXCLUSION REASON</th>
+              </tr>
+            </thead>
+            <tbody>
+              {inactiveStudents.length === 0 ? (
+                <tr>
+                  <td colSpan="7" style={{ padding: '30px', textAlign: 'center', color: 'var(--muted)', fontSize: '0.9rem' }}>
+                    No students have been excluded. All registered users have met testing compliance thresholds.
+                  </td>
+                </tr>
+              ) : (
+                inactiveStudents.map((stu, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid var(--border)', transition: 'all 0.15s' }}>
+                    <td style={{ padding: '14px 8px', fontWeight: '700', color: 'var(--muted)' }}>{stu.username}</td>
+                    <td style={{ padding: '14px 8px', textAlign: 'center', color: 'var(--muted)' }}>
+                      {stu.grade ? `Grade ${stu.grade}` : 'N/A'}
+                    </td>
+                    <td style={{ padding: '14px 8px', textAlign: 'center', color: '#38bdf8', fontWeight: '600' }}>{stu.active_hours.toFixed(2)} hrs</td>
+                    <td style={{ padding: '14px 8px', textAlign: 'center', color: 'var(--muted)' }}>{stu.questions_answered}</td>
+                    
+                    <td style={{ padding: '14px 8px', textAlign: 'center', color: 'var(--muted)' }}>
+                      {stu.pre_score !== null ? `${stu.pre_score}%` : 'N/A'}
+                    </td>
+                    <td style={{ padding: '14px 8px', textAlign: 'center', color: 'var(--muted)' }}>
+                      {stu.post_score !== null ? `${stu.post_score}%` : 'Pending'}
+                    </td>
+
+                    <td style={{ padding: '14px 8px', textAlign: 'center', color: '#ef4444', fontWeight: '600', fontSize: '0.8rem' }}>
+                      {stu.questions_answered === 0 
+                        ? '🚫 Zero Questions Answered' 
+                        : `⏳ Low Practice Time (${stu.active_hours.toFixed(2)} hrs < 0.3 hrs)`
+                      }
                     </td>
                   </tr>
                 ))
