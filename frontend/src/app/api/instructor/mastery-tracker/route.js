@@ -98,7 +98,8 @@ export async function GET(req) {
         survey_completed: !!student.evaluation_questionnaire,
         active_dates: activeDates,
         last_active_date: lastActiveDate,
-        grade: student.grade || ""
+        grade: student.grade || "",
+        cohort: student.cohort || ""
       };
     });
 

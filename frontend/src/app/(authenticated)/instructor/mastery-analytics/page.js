@@ -13,9 +13,7 @@ export default function MasteryAnalytics() {
   const [selectedDate, setSelectedDate] = useState('all'); // 'all', 'today', 'tomorrow', or specific YYYY-MM-DD
   const [selectedGrade, setSelectedGrade] = useState('all'); // 'all', '7', '8'
   const [selectedPostAssessment, setSelectedPostAssessment] = useState('all'); // 'all', 'completed', 'pending'
-  const [selectedStudents, setSelectedStudents] = useState([]); // Array of usernames
-  const [studentSearch, setStudentSearch] = useState('');
-  const [showStudentDropdown, setShowStudentDropdown] = useState(false);
+  const [selectedCohort, setSelectedCohort] = useState('all'); // 'all', 'A', 'B', 'unassigned'
 
   useEffect(() => {
     async function loadData() {
@@ -28,8 +26,7 @@ export default function MasteryAnalytics() {
           const data = await res.json();
           const studentList = data.students || [];
           setStudents(studentList);
-          // Pre-select all students initially
-          setSelectedStudents(studentList.map(s => s.username));
+          // Data loaded successfully
         }
       } catch (err) {
         console.error('Failed to load mastery data', err);
@@ -74,10 +71,13 @@ export default function MasteryAnalytics() {
     return !s.post_assessment_completed;
   });
 
-  // Further narrow down by chosen students (checkboxes)
-  const finalFilteredStudents = postAssessmentFilteredStudents.filter(s => 
-    selectedStudents.includes(s.username)
-  );
+  // Further narrow down by chosen cohort
+  const finalFilteredStudents = postAssessmentFilteredStudents.filter(s => {
+    if (selectedCohort === 'all') return true;
+    if (selectedCohort === 'A') return s.cohort === 'A';
+    if (selectedCohort === 'B') return s.cohort === 'B';
+    return s.cohort === ''; // unassigned
+  });
 
   // Helper: Export to CSV (Perfect for thesis data appendices!)
   const exportToCSV = () => {
@@ -278,33 +278,7 @@ export default function MasteryAnalytics() {
               <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Login/Activity Date</label>
               <select 
                 value={selectedDate} 
-                onChange={(e) => {
-                  setSelectedDate(e.target.value);
-                  // Dynamic behavior: When date changes, auto-select all students in that day's cohort matching current grade and post filter
-                  let filteredByDate = [];
-                  if (e.target.value === 'all') {
-                    filteredByDate = students;
-                  } else {
-                    let targetDateStr = e.target.value;
-                    if (e.target.value === 'today') {
-                      targetDateStr = new Date().toISOString().split('T')[0];
-                    } else if (e.target.value === 'tomorrow') {
-                      targetDateStr = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    }
-                    filteredByDate = students.filter(s => s.active_dates && s.active_dates.includes(targetDateStr));
-                  }
-                  
-                  const newlyFilteredByGrade = filteredByDate.filter(s => {
-                    if (selectedGrade === 'all') return true;
-                    return s.grade === selectedGrade;
-                  });
-                  const newlyFilteredByPost = newlyFilteredByGrade.filter(s => {
-                    if (selectedPostAssessment === 'all') return true;
-                    if (selectedPostAssessment === 'completed') return s.post_assessment_completed;
-                    return !s.post_assessment_completed;
-                  });
-                  setSelectedStudents(newlyFilteredByPost.map(s => s.username));
-                }} 
+                onChange={(e) => setSelectedDate(e.target.value)} 
                 style={{ 
                   width: '210px', 
                   padding: '10px 16px', 
@@ -333,32 +307,7 @@ export default function MasteryAnalytics() {
               <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Grade Level</label>
               <select 
                 value={selectedGrade} 
-                onChange={(e) => {
-                  setSelectedGrade(e.target.value);
-                  let filteredByDate = [];
-                  if (selectedDate === 'all') {
-                    filteredByDate = students;
-                  } else {
-                    let targetDateStr = selectedDate;
-                    if (selectedDate === 'today') {
-                      targetDateStr = new Date().toISOString().split('T')[0];
-                    } else if (selectedDate === 'tomorrow') {
-                      targetDateStr = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    }
-                    filteredByDate = students.filter(s => s.active_dates && s.active_dates.includes(targetDateStr));
-                  }
-                  
-                  const newlyFilteredByGrade = filteredByDate.filter(s => {
-                    if (e.target.value === 'all') return true;
-                    return s.grade === e.target.value;
-                  });
-                  const newlyFilteredByPost = newlyFilteredByGrade.filter(s => {
-                    if (selectedPostAssessment === 'all') return true;
-                    if (selectedPostAssessment === 'completed') return s.post_assessment_completed;
-                    return !s.post_assessment_completed;
-                  });
-                  setSelectedStudents(newlyFilteredByPost.map(s => s.username));
-                }} 
+                onChange={(e) => setSelectedGrade(e.target.value)} 
                 style={{ 
                   width: '140px', 
                   padding: '10px 16px', 
@@ -384,32 +333,7 @@ export default function MasteryAnalytics() {
               <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Post-Assessment</label>
               <select 
                 value={selectedPostAssessment} 
-                onChange={(e) => {
-                  setSelectedPostAssessment(e.target.value);
-                  let filteredByDate = [];
-                  if (selectedDate === 'all') {
-                    filteredByDate = students;
-                  } else {
-                    let targetDateStr = selectedDate;
-                    if (selectedDate === 'today') {
-                      targetDateStr = new Date().toISOString().split('T')[0];
-                    } else if (selectedDate === 'tomorrow') {
-                      targetDateStr = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    }
-                    filteredByDate = students.filter(s => s.active_dates && s.active_dates.includes(targetDateStr));
-                  }
-                  
-                  const newlyFilteredByGrade = filteredByDate.filter(s => {
-                    if (selectedGrade === 'all') return true;
-                    return s.grade === selectedGrade;
-                  });
-                  const newlyFilteredByPost = newlyFilteredByGrade.filter(s => {
-                    if (e.target.value === 'all') return true;
-                    if (e.target.value === 'completed') return s.post_assessment_completed;
-                    return !s.post_assessment_completed;
-                  });
-                  setSelectedStudents(newlyFilteredByPost.map(s => s.username));
-                }} 
+                onChange={(e) => setSelectedPostAssessment(e.target.value)} 
                 style={{ 
                   width: '180px', 
                   padding: '10px 16px', 
@@ -430,151 +354,31 @@ export default function MasteryAnalytics() {
               </select>
             </div>
 
-            {/* Student Selector Multi-Select Dropdown */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', position: 'relative' }}>
-              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Select Target Students</label>
-              <button 
-                type="button"
-                onClick={() => setShowStudentDropdown(!showStudentDropdown)}
-                className="btn btn-secondary"
+            {/* Cohort Group Filter */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Cohort Group</label>
+              <select 
+                value={selectedCohort} 
+                onChange={(e) => setSelectedCohort(e.target.value)} 
                 style={{ 
                   width: '230px', 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center', 
                   padding: '10px 16px', 
+                  borderRadius: '10px', 
                   fontSize: '0.85rem',
-                  borderRadius: '10px',
                   background: '#1e293b',
-                  border: '1.5px solid rgba(139, 92, 246, 0.5)',
                   color: '#ffffff',
+                  border: '1.5px solid rgba(139, 92, 246, 0.5)',
                   fontWeight: '600',
+                  outline: 'none',
                   cursor: 'pointer',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
                 }}
               >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <i className="fa-solid fa-users" style={{ color: 'var(--primary)' }}></i>
-                  {selectedStudents.length === postAssessmentFilteredStudents.length 
-                    ? 'All Cohort Selected' 
-                    : `Selected: ${selectedStudents.length} / ${postAssessmentFilteredStudents.length}`}
-                </span>
-                <i className={`fa-solid fa-chevron-${showStudentDropdown ? 'up' : 'down'}`} style={{ fontSize: '0.75rem', opacity: 0.7 }}></i>
-              </button>
-
-              {showStudentDropdown && (
-                <>
-                  {/* Backdrop for closing dropdown on clicking outside */}
-                  <div 
-                    onClick={() => setShowStudentDropdown(false)}
-                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99, background: 'transparent' }}
-                  />
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: '100%', 
-                    right: 0, 
-                    zIndex: 100, 
-                    width: '280px', 
-                    marginTop: '6px',
-                    padding: '12px',
-                    background: 'rgba(20, 24, 45, 0.98)', 
-                    backdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(139, 92, 246, 0.3)', 
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px'
-                  }}>
-                    {/* Search box inside dropdown */}
-                    <input 
-                      type="text" 
-                      placeholder="🔍 Search username..." 
-                      value={studentSearch}
-                      onChange={(e) => setStudentSearch(e.target.value)}
-                      style={{ 
-                        padding: '6px 10px', 
-                        fontSize: '0.8rem', 
-                        borderRadius: '6px', 
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        color: '#fff',
-                        outline: 'none'
-                      }} 
-                    />
-
-                    {/* Quick Select Buttons */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '0 2px' }}>
-                      <button 
-                        type="button"
-                        onClick={() => setSelectedStudents(postAssessmentFilteredStudents.map(s => s.username))}
-                        style={{ fontSize: '0.75rem', background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', padding: 0 }}
-                      >
-                        Select All Cohort
-                      </button>
-                      <button 
-                        type="button"
-                        onClick={() => setSelectedStudents([])}
-                        style={{ fontSize: '0.75rem', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: 0 }}
-                      >
-                        Clear All
-                      </button>
-                    </div>
-
-                    {/* List of Student checkboxes */}
-                    <div style={{ 
-                      maxHeight: '180px', 
-                      overflowY: 'auto', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      gap: '4px',
-                      paddingTop: '4px'
-                    }}>
-                      {postAssessmentFilteredStudents.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '10px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>
-                          No active students found for this cohort.
-                        </div>
-                      ) : (
-                        postAssessmentFilteredStudents
-                          .filter(s => s.username.toLowerCase().includes(studentSearch.toLowerCase()))
-                          .map(s => {
-                            const isChecked = selectedStudents.includes(s.username);
-                            return (
-                              <label 
-                                key={s.username} 
-                                style={{ 
-                                  display: 'flex', 
-                                  alignItems: 'center', 
-                                  gap: '8px', 
-                                  fontSize: '0.8rem', 
-                                  cursor: 'pointer',
-                                  padding: '5px 8px',
-                                  borderRadius: '6px',
-                                  background: isChecked ? 'rgba(139,92,246,0.12)' : 'transparent',
-                                  transition: 'all 0.15s'
-                                }}
-                              >
-                                <input 
-                                  type="checkbox" 
-                                  checked={isChecked}
-                                  onChange={() => {
-                                    if (isChecked) {
-                                      setSelectedStudents(selectedStudents.filter(u => u !== s.username));
-                                    } else {
-                                      setSelectedStudents([...selectedStudents, s.username]);
-                                    }
-                                  }}
-                                  style={{ cursor: 'pointer' }}
-                                />
-                                <span style={{ color: isChecked ? '#fff' : 'var(--muted)' }}>{s.username}</span>
-                              </label>
-                            );
-                          })
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
+                <option value="all">👥 All Cohorts</option>
+                <option value="A">👥 Cohort A (Supervised)</option>
+                <option value="B">👥 Cohort B (Remote)</option>
+                <option value="unassigned">👥 Unassigned Cohorts</option>
+              </select>
             </div>
           </div>
         </div>
