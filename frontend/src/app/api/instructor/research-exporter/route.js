@@ -95,28 +95,15 @@ export async function GET(req) {
         ? Math.round((successfulInterventions / scaffoldCount) * 100)
         : null;
 
-      // Calculate active hours using sessionization (15 mins threshold)
+      // Calculate active hours as the entire span from first to last activity on the website
       let activeHours = 0;
       if (studentActs.length > 0) {
         const sorted = studentActs
           .map(a => new Date(a.createdAt).getTime())
           .sort((a, b) => a - b);
-        
-        let totalTimeMs = 0;
-        let currentSessionStart = sorted[0];
-        let currentSessionLast = sorted[0];
-        const SESSION_THRESHOLD_MS = 15 * 60 * 1000;
-        
-        for (let i = 1; i < sorted.length; i++) {
-          if (sorted[i] - currentSessionLast < SESSION_THRESHOLD_MS) {
-            currentSessionLast = sorted[i];
-          } else {
-            totalTimeMs += Math.max(currentSessionLast - currentSessionStart, 60 * 1000);
-            currentSessionStart = sorted[i];
-            currentSessionLast = sorted[i];
-          }
-        }
-        totalTimeMs += Math.max(currentSessionLast - currentSessionStart, 60 * 1000);
+        const spanMs = sorted[sorted.length - 1] - sorted[0];
+        // Ensure a minimum of 1 minute if there is at least one activity
+        const totalTimeMs = Math.max(spanMs, 60 * 1000);
         activeHours = Math.round((totalTimeMs / (1000 * 60 * 60)) * 100) / 100;
       }
 
@@ -142,8 +129,8 @@ export async function GET(req) {
 
     // Calculate Cohort Cohort Summary Statistics
     const computeCohortStats = (cohortName) => {
-      // Exclude students who are inactive (answered 0 questions OR active for less than 0.3 hours)
-      const activeDataset = dataset.filter(s => s.questions_answered > 0 && s.active_hours >= 0.3);
+      // Exclude students who are inactive (answered < 10 questions AND did not complete post-assessment)
+      const activeDataset = dataset.filter(s => s.questions_answered >= 10 || s.post_score !== null);
       const cohortCohort = activeDataset.filter(s => s.cohort === cohortName);
       const validGains = cohortCohort.filter(s => s.learning_gain !== null);
       

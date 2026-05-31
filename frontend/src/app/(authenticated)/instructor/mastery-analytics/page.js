@@ -42,9 +42,9 @@ export default function MasteryAnalytics() {
     new Set(students.flatMap(s => s.active_dates || []))
   ).sort((a, b) => b.localeCompare(a));
 
-  // Filter active vs inactive students (Active study cohort: questions > 0 AND active hours >= 0.3)
-  const activeStudents = students.filter(s => s.questions_answered > 0 && s.active_hours >= 0.3);
-  const inactiveStudents = students.filter(s => s.questions_answered === 0 || s.active_hours < 0.3);
+  // Filter active vs inactive students (Active: questions >= 10 OR post-assessment completed)
+  const activeStudents = students.filter(s => s.questions_answered >= 10 || s.post_assessment_completed);
+  const inactiveStudents = students.filter(s => s.questions_answered < 10 && !s.post_assessment_completed);
 
   // Determine current active subset of students based on date filter
   const getFilteredByDateStudents = () => {
@@ -716,7 +716,7 @@ export default function MasteryAnalytics() {
               <i className="fa-solid fa-triangle-exclamation"></i> Excluded Cohort: Insufficient Activity for Testing
             </h2>
             <p className="section-note" style={{ margin: '5px 0 0' }}>
-              Students who registered but answered 0 questions or practiced for less than 0.3 hours. Excluded from primary learning metrics & regression analytics.
+              Students who registered but answered less than 10 questions and did not complete the post-assessment. Excluded from primary learning metrics & regression analytics.
             </p>
           </div>
           <span style={{ fontSize: '0.85rem', color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)', padding: '6px 12px', borderRadius: '20px', fontWeight: 'bold' }}>
@@ -770,10 +770,7 @@ export default function MasteryAnalytics() {
                     </td>
 
                     <td style={{ padding: '14px 8px', textAlign: 'center', color: '#ef4444', fontWeight: '600', fontSize: '0.8rem' }}>
-                      {stu.questions_answered === 0 
-                        ? '🚫 Zero Questions Answered' 
-                        : `⏳ Low Practice Time (${stu.active_hours.toFixed(2)} hrs < 0.3 hrs)`
-                      }
+                      {`🚫 Insufficient Practice (Only ${stu.questions_answered} questions answered)`}
                     </td>
                   </tr>
                 ))
