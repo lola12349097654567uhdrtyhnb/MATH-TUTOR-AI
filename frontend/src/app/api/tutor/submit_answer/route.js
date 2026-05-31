@@ -53,7 +53,8 @@ export async function POST(req) {
         is_correct: python_resp.is_correct,
         difficulty: question_difficulty || user[`current_action_${topic}`]?.difficulty || 'medium',
         attempt_number: attemptNumber,
-        options: options || user[`current_action_${topic}`]?.options || []
+        options: options || user[`current_action_${topic}`]?.options || [],
+        response_time_seconds
       }
     });
 

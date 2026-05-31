@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
   role: { type: String, enum: ['student', 'instructor'], default: 'student' },
   phone: { type: String, default: "" },
   grade: { type: String, enum: ['7', '8', ''], default: '' },
+  cohort: { type: String, enum: ['A', 'B', ''], default: '' },
   profile_configured: { type: Boolean, default: false },
   learning_profile: { type: mongoose.Schema.Types.Mixed, default: {} },
   notifications: [{
