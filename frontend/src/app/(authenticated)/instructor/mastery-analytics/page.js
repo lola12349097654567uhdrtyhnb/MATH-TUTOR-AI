@@ -250,7 +250,8 @@ export default function MasteryAnalytics() {
         background: 'rgba(255, 255, 255, 0.02)', 
         border: '1px solid rgba(255, 255, 255, 0.06)',
         borderRadius: '16px',
-        position: 'relative'
+        position: 'relative',
+        overflow: 'visible'
       }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
