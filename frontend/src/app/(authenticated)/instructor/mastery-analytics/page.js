@@ -634,8 +634,14 @@ export default function MasteryAnalytics() {
           </div>
 
           {/* Interactive SVG Plot */}
-          <div style={{ width: '100%', overflowX: 'auto', background: 'rgba(0,0,0,0.15)', borderRadius: '16px', border: '1px solid var(--border)' }}>
-            <svg width={width} height={height} style={{ display: 'block', margin: '0 auto', overflow: 'visible' }}>
+          <div style={{ width: '100%', overflowX: 'auto', background: 'rgba(0,0,0,0.15)', borderRadius: '16px', border: '1px solid var(--border)', padding: '15px' }}>
+            <div style={{ minWidth: '600px', width: '100%' }}>
+              <svg 
+                viewBox={`0 0 ${width} ${height}`} 
+                width="100%" 
+                height="100%" 
+                style={{ display: 'block', margin: '0 auto', overflow: 'visible' }}
+              >
               {/* Glowing Background Grid Lines */}
               {[0, 20, 40, 60, 80, 100].map(y => (
                 <g key={y}>
@@ -759,6 +765,7 @@ export default function MasteryAnalytics() {
             </svg>
           </div>
         </div>
+      </div>
 
         {/* Live Detail Hover Info Box */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -913,7 +920,19 @@ export default function MasteryAnalytics() {
             <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)', lineHeight: '1.4' }}>
               Student mastery levels are computed dynamically at each step utilizing the standard BKT hidden Markov model updating:
               <br />
-              <code style={{ background: 'rgba(0,0,0,0.3)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.78rem', display: 'block', margin: '8px 0', color: 'var(--primary)', fontFamily: 'monospace' }}>
+              <code style={{ 
+                background: 'rgba(0,0,0,0.3)', 
+                padding: '10px 14px', 
+                borderRadius: '8px', 
+                fontSize: '0.78rem', 
+                display: 'block', 
+                margin: '8px 0', 
+                color: 'var(--primary)', 
+                fontFamily: 'monospace',
+                overflowX: 'auto',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-all'
+              }}>
                 P(L_t | Action) = P(L_(t-1)) * (1 - P(Forget)) / ...
               </code>
               A student is defined to have mastered a specific mathematical focus topic when their belief updates yield <code style={{ color: 'var(--primary)' }}>P(L_t) &ge; 0.95</code>, unlocking Graduation.
@@ -937,7 +956,7 @@ export default function MasteryAnalytics() {
           from { opacity: 0; transform: translateY(5px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @media (max-width: 800px) {
+        @media (max-width: 1100px) {
           .responsive-column-grid {
             grid-template-columns: 1fr !important;
           }

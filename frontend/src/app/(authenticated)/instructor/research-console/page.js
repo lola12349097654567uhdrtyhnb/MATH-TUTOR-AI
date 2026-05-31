@@ -140,38 +140,43 @@ export default function ResearchConsole() {
       </header>
 
       {/* Cohort Comparison Overview Panel */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '30px' }} className="responsive-column-grid">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '25px', marginBottom: '30px' }} className="responsive-column-grid">
         {/* Cohort A Card */}
         <div className="card" style={{ 
           background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(20, 24, 45, 0.45))',
           border: '1.5px solid rgba(139, 92, 246, 0.3)',
           padding: '24px',
-          borderRadius: '20px'
+          borderRadius: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>CONTROL group</span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--muted)', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '20px' }}>
-              {cohortA.size} Active Students
-            </span>
-          </div>
-          <h3 style={{ margin: '0 0 16px', fontSize: '1.4rem', color: '#fff' }}>Cohort A: Supervised (In-Class)</h3>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', textAlign: 'center' }}>
-            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '12px' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block', marginBottom: '4px' }}>Avg Pre-Score</span>
-              <strong style={{ fontSize: '1.25rem', color: '#fff' }}>{cohortA.avg_pre}%</strong>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>CONTROL group</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--muted)', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '20px' }}>
+                {cohortA.size} Active Students
+              </span>
             </div>
-            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '12px' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block', marginBottom: '4px' }}>Avg Post-Score</span>
-              <strong style={{ fontSize: '1.25rem', color: '#fff' }}>{cohortA.avg_post}%</strong>
-            </div>
-            <div style={{ background: 'rgba(139, 92, 246, 0.15)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--primary)', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>Learning Gain (Δ)</span>
-              <strong style={{ fontSize: '1.25rem', color: '#a78bfa' }}>+{cohortA.avg_gain}%</strong>
+            <h3 style={{ margin: '0 0 16px', fontSize: '1.4rem', color: '#fff' }}>Cohort A: Supervised (In-Class)</h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: '15px', textAlign: 'center' }}>
+              <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '12px' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block', marginBottom: '4px' }}>Avg Pre-Score</span>
+                <strong style={{ fontSize: '1.25rem', color: '#fff' }}>{cohortA.avg_pre}%</strong>
+              </div>
+              <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '12px' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block', marginBottom: '4px' }}>Avg Post-Score</span>
+                <strong style={{ fontSize: '1.25rem', color: '#fff' }}>{cohortA.avg_post}%</strong>
+              </div>
+              <div style={{ background: 'rgba(139, 92, 246, 0.15)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--primary)', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>Learning Gain (Δ)</span>
+                <strong style={{ fontSize: '1.25rem', color: '#a78bfa' }}>+{cohortA.avg_gain}%</strong>
+              </div>
             </div>
           </div>
 
-          <div style={{ marginTop: '20px', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+          <div style={{ marginTop: '20px', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', flexWrap: 'wrap', gap: '10px' }}>
             <div>Total AI Walkthroughs: <strong style={{ color: '#fff' }}>{cohortA.total_ai_scaffolds}</strong></div>
             <div>Post-Walkthrough Success: <strong style={{ color: '#10b981' }}>{cohortA.avg_ai_success_rate}%</strong></div>
           </div>
@@ -182,32 +187,37 @@ export default function ResearchConsole() {
           background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(20, 24, 45, 0.45))',
           border: '1.5px solid rgba(56, 189, 248, 0.3)',
           padding: '24px',
-          borderRadius: '20px'
+          borderRadius: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '1px' }}>EXPERIMENTAL group</span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--muted)', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '20px' }}>
-              {cohortB.size} Active Students
-            </span>
-          </div>
-          <h3 style={{ margin: '0 0 16px', fontSize: '1.4rem', color: '#fff' }}>Cohort B: Remote (Self-Paced)</h3>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', textAlign: 'center' }}>
-            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '12px' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block', marginBottom: '4px' }}>Avg Pre-Score</span>
-              <strong style={{ fontSize: '1.25rem', color: '#fff' }}>{cohortB.avg_pre}%</strong>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '1px' }}>EXPERIMENTAL group</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--muted)', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '20px' }}>
+                {cohortB.size} Active Students
+              </span>
             </div>
-            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '12px' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block', marginBottom: '4px' }}>Avg Post-Score</span>
-              <strong style={{ fontSize: '1.25rem', color: '#fff' }}>{cohortB.avg_post}%</strong>
-            </div>
-            <div style={{ background: 'rgba(56, 189, 248, 0.15)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
-              <span style={{ fontSize: '0.75rem', color: '#38bdf8', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>Learning Gain (Δ)</span>
-              <strong style={{ fontSize: '1.25rem', color: '#38bdf8' }}>+{cohortB.avg_gain}%</strong>
+            <h3 style={{ margin: '0 0 16px', fontSize: '1.4rem', color: '#fff' }}>Cohort B: Remote (Self-Paced)</h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: '15px', textAlign: 'center' }}>
+              <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '12px' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block', marginBottom: '4px' }}>Avg Pre-Score</span>
+                <strong style={{ fontSize: '1.25rem', color: '#fff' }}>{cohortB.avg_pre}%</strong>
+              </div>
+              <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '12px' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block', marginBottom: '4px' }}>Avg Post-Score</span>
+                <strong style={{ fontSize: '1.25rem', color: '#fff' }}>{cohortB.avg_post}%</strong>
+              </div>
+              <div style={{ background: 'rgba(56, 189, 248, 0.15)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+                <span style={{ fontSize: '0.75rem', color: '#38bdf8', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>Learning Gain (Δ)</span>
+                <strong style={{ fontSize: '1.25rem', color: '#38bdf8' }}>+{cohortB.avg_gain}%</strong>
+              </div>
             </div>
           </div>
 
-          <div style={{ marginTop: '20px', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+          <div style={{ marginTop: '20px', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', flexWrap: 'wrap', gap: '10px' }}>
             <div>Total AI Walkthroughs: <strong style={{ color: '#fff' }}>{cohortB.total_ai_scaffolds}</strong></div>
             <div>Post-Walkthrough Success: <strong style={{ color: '#10b981' }}>{cohortB.avg_ai_success_rate}%</strong></div>
           </div>
@@ -426,7 +436,20 @@ export default function ResearchConsole() {
             <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)', lineHeight: '1.4' }}>
               To prove that generative AI anxiety reduction succeeds under the BKT-POMDP engine, you can write:
               <br />
-              <code style={{ background: 'rgba(0,0,0,0.3)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.76rem', display: 'block', margin: '8px 0', color: 'var(--primary)', fontFamily: 'monospace', lineHeight: '1.3' }}>
+              <code style={{ 
+                background: 'rgba(0,0,0,0.3)', 
+                padding: '10px 14px', 
+                borderRadius: '8px', 
+                fontSize: '0.76rem', 
+                display: 'block', 
+                margin: '8px 0', 
+                color: 'var(--primary)', 
+                fontFamily: 'monospace', 
+                lineHeight: '1.3',
+                overflowX: 'auto',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-all'
+              }}>
                 {"\\text{Scaffold Success Rate} = \\frac{\\sum \\text{Success}_{Post-Intervention}}{\\sum \\text{Interventions}_{Total}} \\times 100"}
               </code>
               This measures the immediate state transfer efficiency from struggle state back to correct action, demonstrating empirical validity.
@@ -438,7 +461,20 @@ export default function ResearchConsole() {
             <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)', lineHeight: '1.4' }}>
               Run an independent two-sample t-test using the **Export Thesis Dataset (.CSV)** raw file on Cohort A and Cohort B conceptual learning gains:
               <br />
-              <code style={{ background: 'rgba(0,0,0,0.3)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.76rem', display: 'block', margin: '8px 0', color: '#38bdf8', fontFamily: 'monospace', lineHeight: '1.3' }}>
+              <code style={{ 
+                background: 'rgba(0,0,0,0.3)', 
+                padding: '10px 14px', 
+                borderRadius: '8px', 
+                fontSize: '0.76rem', 
+                display: 'block', 
+                margin: '8px 0', 
+                color: '#38bdf8', 
+                fontFamily: 'monospace', 
+                lineHeight: '1.3',
+                overflowX: 'auto',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-all'
+              }}>
                 {"t = \\frac{\\bar{X}_B - \\bar{X}_A}{\\sqrt{ \\frac{s_B^2}{n_B} + \\frac{s_A^2}{n_A} }}"}
               </code>
               This mathematically determines if the platform environment (supervised vs self-paced remote) yielded statistical equivalence or differences in pedagogical gains.
@@ -448,7 +484,7 @@ export default function ResearchConsole() {
       </div>
       
       <style jsx global>{`
-        @media (max-width: 800px) {
+        @media (max-width: 1100px) {
           .responsive-column-grid {
             grid-template-columns: 1fr !important;
           }
