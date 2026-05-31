@@ -97,7 +97,8 @@ export async function GET(req) {
         post_assessment_completed: !!student.post_assessment?.completed,
         survey_completed: !!student.evaluation_questionnaire,
         active_dates: activeDates,
-        last_active_date: lastActiveDate
+        last_active_date: lastActiveDate,
+        grade: student.grade || ""
       };
     });
 

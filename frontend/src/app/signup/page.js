@@ -7,6 +7,7 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
+  const [grade, setGrade] = useState('7');
   const [role, setRole] = useState('student');
   const [error, setError] = useState(null);
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function Signup() {
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role, phone })
+      body: JSON.stringify({ email, password, role, phone, grade: role === 'student' ? grade : '' })
     });
     const data = await res.json();
     if (res.ok) {
@@ -53,7 +54,7 @@ export default function Signup() {
               <input type="text" placeholder="Enter phone number (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
 
-            <div className="form-group" style={{marginBottom: '32px', padding: '16px', background: 'rgba(139, 92, 246, 0.05)', borderRadius: '16px', border: '1px solid rgba(139, 92, 246, 0.1)'}}>
+            <div className="form-group" style={{marginBottom: '16px', padding: '16px', background: 'rgba(139, 92, 246, 0.05)', borderRadius: '16px', border: '1px solid rgba(139, 92, 246, 0.1)'}}>
               <label style={{color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px'}}>
                 <i className="fa-solid fa-user-gear"></i> Account Type
               </label>
@@ -65,6 +66,21 @@ export default function Signup() {
                 Choose "Instructor" if you are a teacher managing students.
               </p>
             </div>
+
+            {role === 'student' && (
+              <div className="form-group" style={{marginBottom: '32px', padding: '16px', background: 'rgba(56, 189, 248, 0.05)', borderRadius: '16px', border: '1px solid rgba(56, 189, 248, 0.1)'}}>
+                <label style={{color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px'}}>
+                  <i className="fa-solid fa-graduation-cap"></i> School Grade Level
+                </label>
+                <select value={grade} onChange={(e) => setGrade(e.target.value)} style={{background: 'var(--bg)'}}>
+                  <option value="7">Grade 7</option>
+                  <option value="8">Grade 8</option>
+                </select>
+                <p style={{fontSize: '0.8rem', color: 'var(--muted)', marginTop: '8px', marginLeft: '4px'}}>
+                  Select your current grade. This helps customize cognitive maths modules.
+                </p>
+              </div>
+            )}
 
             <button type="submit" className="btn btn-primary" style={{width: '100%', justifyContent: 'center'}}>
               Create Account

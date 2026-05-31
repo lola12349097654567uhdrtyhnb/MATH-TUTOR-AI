@@ -5,7 +5,7 @@ import User from '@/lib/models/User';
 export async function POST(req) {
   try {
     await dbConnect();
-    const { email, password, role, phone } = await req.json();
+    const { email, password, role, phone, grade } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
@@ -30,7 +30,8 @@ export async function POST(req) {
       email,
       password_hash: password,
       role: role || 'student',
-      phone: phone || ''
+      phone: phone || '',
+      grade: role === 'instructor' ? '' : (grade || '')
     });
 
     await newUser.save();

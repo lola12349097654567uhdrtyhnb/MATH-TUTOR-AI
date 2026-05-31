@@ -11,6 +11,7 @@ export default function MasteryAnalytics() {
 
   // Advanced Cohort Multi-Select and Date Filters
   const [selectedDate, setSelectedDate] = useState('all'); // 'all', 'today', 'tomorrow', or specific YYYY-MM-DD
+  const [selectedGrade, setSelectedGrade] = useState('all'); // 'all', '7', '8'
   const [selectedStudents, setSelectedStudents] = useState([]); // Array of usernames
   const [studentSearch, setStudentSearch] = useState('');
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
@@ -59,8 +60,14 @@ export default function MasteryAnalytics() {
 
   const dateFilteredStudents = getFilteredByDateStudents();
 
+  // Filter by grade level
+  const gradeFilteredStudents = dateFilteredStudents.filter(s => {
+    if (selectedGrade === 'all') return true;
+    return s.grade === selectedGrade;
+  });
+
   // Further narrow down by chosen students (checkboxes)
-  const finalFilteredStudents = dateFilteredStudents.filter(s => 
+  const finalFilteredStudents = gradeFilteredStudents.filter(s => 
     selectedStudents.includes(s.username)
   );
 
@@ -68,6 +75,7 @@ export default function MasteryAnalytics() {
   const exportToCSV = () => {
     const headers = [
       'Student Name',
+      'Grade',
       'Active Practice Hours',
       'Total Questions Answered',
       'Average BKT Mastery (%)',
@@ -85,6 +93,7 @@ export default function MasteryAnalytics() {
 
     const rows = finalFilteredStudents.map(s => [
       s.username,
+      s.grade ? `Grade ${s.grade}` : 'N/A',
       s.active_hours.toFixed(2),
       s.questions_answered,
       s.average_mastery,
@@ -298,6 +307,50 @@ export default function MasteryAnalytics() {
               </select>
             </div>
 
+            {/* Grade Level Filter */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Grade Level</label>
+              <select 
+                value={selectedGrade} 
+                onChange={(e) => {
+                  setSelectedGrade(e.target.value);
+                  // Dynamic behavior: When grade changes, auto-select all students in that day's cohort matching the new grade
+                  let filteredByDate = [];
+                  if (selectedDate === 'all') {
+                    filteredByDate = students;
+                  } else {
+                    let targetDateStr = selectedDate;
+                    if (selectedDate === 'today') {
+                      targetDateStr = new Date().toISOString().split('T')[0];
+                    } else if (selectedDate === 'tomorrow') {
+                      targetDateStr = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                    }
+                    filteredByDate = students.filter(s => s.active_dates && s.active_dates.includes(targetDateStr));
+                  }
+                  const newlyFilteredByGrade = filteredByDate.filter(s => {
+                    if (e.target.value === 'all') return true;
+                    return s.grade === e.target.value;
+                  });
+                  setSelectedStudents(newlyFilteredByGrade.map(s => s.username));
+                }} 
+                style={{ 
+                  width: '150px', 
+                  padding: '8px 12px', 
+                  borderRadius: '10px', 
+                  fontSize: '0.85rem',
+                  background: 'rgba(0, 0, 0, 0.2)',
+                  color: '#fff',
+                  border: '1px solid var(--border)',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="all">🎓 All Grades</option>
+                <option value="7">🎓 Grade 7</option>
+                <option value="8">🎓 Grade 8</option>
+              </select>
+            </div>
+
             {/* Student Selector Multi-Select Dropdown */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', position: 'relative' }}>
               <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Select Target Students</label>
@@ -321,9 +374,9 @@ export default function MasteryAnalytics() {
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <i className="fa-solid fa-users" style={{ color: 'var(--primary)' }}></i>
-                  {selectedStudents.length === dateFilteredStudents.length 
+                  {selectedStudents.length === gradeFilteredStudents.length 
                     ? 'All Cohort Selected' 
-                    : `Selected: ${selectedStudents.length} / ${dateFilteredStudents.length}`}
+                    : `Selected: ${selectedStudents.length} / ${gradeFilteredStudents.length}`}
                 </span>
                 <i className={`fa-solid fa-chevron-${showStudentDropdown ? 'up' : 'down'}`} style={{ fontSize: '0.75rem', opacity: 0.7 }}></i>
               </button>
@@ -373,7 +426,7 @@ export default function MasteryAnalytics() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '0 2px' }}>
                       <button 
                         type="button"
-                        onClick={() => setSelectedStudents(dateFilteredStudents.map(s => s.username))}
+                        onClick={() => setSelectedStudents(gradeFilteredStudents.map(s => s.username))}
                         style={{ fontSize: '0.75rem', background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', padding: 0 }}
                       >
                         Select All Cohort
@@ -396,12 +449,12 @@ export default function MasteryAnalytics() {
                       gap: '4px',
                       paddingTop: '4px'
                     }}>
-                      {dateFilteredStudents.length === 0 ? (
+                      {gradeFilteredStudents.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '10px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>
-                          No active students found for this date.
+                          No active students found for this cohort.
                         </div>
                       ) : (
-                        dateFilteredStudents
+                        gradeFilteredStudents
                           .filter(s => s.username.toLowerCase().includes(studentSearch.toLowerCase()))
                           .map(s => {
                             const isChecked = selectedStudents.includes(s.username);
@@ -700,6 +753,7 @@ export default function MasteryAnalytics() {
             <thead>
               <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--text)' }}>
                 <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700' }}>STUDENT NAME</th>
+                <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>GRADE</th>
                 <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>ACTIVE HOURS</th>
                 <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>QUESTIONS</th>
                 <th style={{ padding: '12px 8px', fontSize: '0.88rem', fontWeight: '700', textAlign: 'center' }}>MASTERED TOPICS</th>
@@ -715,6 +769,9 @@ export default function MasteryAnalytics() {
               {finalFilteredStudents.map((stu, i) => (
                 <tr key={i} style={{ borderBottom: '1px solid var(--border)', transition: 'all 0.15s' }} className="table-row-hover">
                   <td style={{ padding: '14px 8px', fontWeight: '700', color: '#fff' }}>{stu.username}</td>
+                  <td style={{ padding: '14px 8px', textAlign: 'center', color: '#fbbf24', fontWeight: '600' }}>
+                    {stu.grade ? `Grade ${stu.grade}` : 'N/A'}
+                  </td>
                   <td style={{ padding: '14px 8px', textAlign: 'center', color: '#38bdf8', fontWeight: '600' }}>{stu.active_hours.toFixed(2)} hrs</td>
                   <td style={{ padding: '14px 8px', textAlign: 'center', color: 'var(--muted)' }}>{stu.questions_answered}</td>
                   <td style={{ padding: '14px 8px', textAlign: 'center', color: '#10b981', fontWeight: '600' }}>{stu.topics_graduated} / 4</td>
