@@ -27,6 +27,17 @@ export async function GET(req) {
     const data = allStudents.map(student => {
       const studentActs = allActivities.filter(act => act.username === student.username);
       
+      // Extract active days (registration date + all activity log dates)
+      const regDate = new Date(student.createdAt || Date.now()).toISOString().split('T')[0];
+      const activeDates = Array.from(new Set([
+        regDate,
+        ...studentActs.map(act => new Date(act.createdAt).toISOString().split('T')[0])
+      ]));
+      
+      const lastActiveDate = studentActs.length > 0
+        ? new Date(Math.max(...studentActs.map(a => new Date(a.createdAt).getTime()))).toISOString().split('T')[0]
+        : regDate;
+
       // Calculate active hours using sessionization (15 mins threshold)
       let activeHours = 0;
       if (studentActs.length > 0) {
@@ -84,7 +95,9 @@ export async function GET(req) {
         questions_answered: studentActs.filter(a => a.action === 'answer_question' || a.action === 'upload_work').length,
         pre_assessment_completed: !!student.pre_assessment?.completed,
         post_assessment_completed: !!student.post_assessment?.completed,
-        survey_completed: !!student.evaluation_questionnaire
+        survey_completed: !!student.evaluation_questionnaire,
+        active_dates: activeDates,
+        last_active_date: lastActiveDate
       };
     });
 

@@ -9,6 +9,12 @@ export default function MasteryAnalytics() {
   const [selectedTopic, setSelectedTopic] = useState('average'); // 'average', 'fractions', 'algebra', 'exponents', 'geometry'
   const [hoveredStudent, setHoveredStudent] = useState(null);
 
+  // Advanced Cohort Multi-Select and Date Filters
+  const [selectedDate, setSelectedDate] = useState('all'); // 'all', 'today', 'tomorrow', or specific YYYY-MM-DD
+  const [selectedStudents, setSelectedStudents] = useState([]); // Array of usernames
+  const [studentSearch, setStudentSearch] = useState('');
+  const [showStudentDropdown, setShowStudentDropdown] = useState(false);
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -18,7 +24,10 @@ export default function MasteryAnalytics() {
         });
         if (res.ok) {
           const data = await res.json();
-          setStudents(data.students || []);
+          const studentList = data.students || [];
+          setStudents(studentList);
+          // Pre-select all students initially
+          setSelectedStudents(studentList.map(s => s.username));
         }
       } catch (err) {
         console.error('Failed to load mastery data', err);
@@ -28,6 +37,32 @@ export default function MasteryAnalytics() {
     }
     loadData();
   }, []);
+
+  // Helper: Extract unique active dates present in the classroom dataset
+  const uniqueDates = Array.from(
+    new Set(students.flatMap(s => s.active_dates || []))
+  ).sort((a, b) => b.localeCompare(a));
+
+  // Determine current active subset of students based on date filter
+  const getFilteredByDateStudents = () => {
+    if (selectedDate === 'all') return students;
+    
+    let targetDateStr = selectedDate;
+    if (selectedDate === 'today') {
+      targetDateStr = new Date().toISOString().split('T')[0];
+    } else if (selectedDate === 'tomorrow') {
+      targetDateStr = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    }
+    
+    return students.filter(s => s.active_dates && s.active_dates.includes(targetDateStr));
+  };
+
+  const dateFilteredStudents = getFilteredByDateStudents();
+
+  // Further narrow down by chosen students (checkboxes)
+  const finalFilteredStudents = dateFilteredStudents.filter(s => 
+    selectedStudents.includes(s.username)
+  );
 
   // Helper: Export to CSV (Perfect for thesis data appendices!)
   const exportToCSV = () => {
@@ -44,10 +79,11 @@ export default function MasteryAnalytics() {
       'Rate of Learning (Topics/Hour)',
       'Pre-Assessment Done',
       'Post-Assessment Done',
-      'Survey Done'
+      'Survey Done',
+      'Last Active Date'
     ];
 
-    const rows = students.map(s => [
+    const rows = finalFilteredStudents.map(s => [
       s.username,
       s.active_hours.toFixed(2),
       s.questions_answered,
@@ -60,7 +96,8 @@ export default function MasteryAnalytics() {
       s.rate_of_learning.toFixed(2),
       s.pre_assessment_completed ? 'Yes' : 'No',
       s.post_assessment_completed ? 'Yes' : 'No',
-      s.survey_completed ? 'Yes' : 'No'
+      s.survey_completed ? 'Yes' : 'No',
+      s.last_active_date || 'N/A'
     ]);
 
     const csvContent = [
@@ -72,7 +109,7 @@ export default function MasteryAnalytics() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'academic_mastery_dataset.csv');
+    link.setAttribute('download', `academic_mastery_dataset_${selectedDate}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -83,7 +120,7 @@ export default function MasteryAnalytics() {
   }
 
   // Filter plotted points based on selected topic
-  const points = students.map(s => {
+  const points = finalFilteredStudents.map(s => {
     const yValue = selectedTopic === 'average' 
       ? s.average_mastery 
       : Math.round((s.mastery_scores[selectedTopic] || 0) * 100);
@@ -160,16 +197,16 @@ export default function MasteryAnalytics() {
   };
 
   // Class aggregates
-  const classAvgMastery = students.length > 0 
-    ? Math.round(students.reduce((acc, s) => acc + s.average_mastery, 0) / students.length) 
+  const classAvgMastery = finalFilteredStudents.length > 0 
+    ? Math.round(finalFilteredStudents.reduce((acc, s) => acc + s.average_mastery, 0) / finalFilteredStudents.length) 
     : 0;
 
-  const classAvgActiveHours = students.length > 0
-    ? (students.reduce((acc, s) => acc + s.active_hours, 0) / students.length).toFixed(2)
+  const classAvgActiveHours = finalFilteredStudents.length > 0
+    ? (finalFilteredStudents.reduce((acc, s) => acc + s.active_hours, 0) / finalFilteredStudents.length).toFixed(2)
     : '0.00';
 
-  const classAvgRate = students.length > 0
-    ? (students.reduce((acc, s) => acc + s.rate_of_learning, 0) / students.length).toFixed(2)
+  const classAvgRate = finalFilteredStudents.length > 0
+    ? (finalFilteredStudents.reduce((acc, s) => acc + s.rate_of_learning, 0) / finalFilteredStudents.length).toFixed(2)
     : '0.00';
 
   return (
@@ -188,6 +225,226 @@ export default function MasteryAnalytics() {
           </Link>
         </div>
       </header>
+
+      {/* Global Filters & Cohort Management Panel */}
+      <div className="card" style={{ 
+        padding: '20px 24px', 
+        marginBottom: '25px', 
+        background: 'rgba(255, 255, 255, 0.02)', 
+        border: '1px solid rgba(255, 255, 255, 0.06)',
+        borderRadius: '16px',
+        position: 'relative'
+      }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ 
+              background: 'rgba(139, 92, 246, 0.1)', 
+              borderRadius: '12px', 
+              padding: '10px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              border: '1px solid rgba(139, 92, 246, 0.2)' 
+            }}>
+              <i className="fa-solid fa-filter" style={{ color: 'var(--primary)', fontSize: '1.2rem' }}></i>
+            </div>
+            <div>
+              <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: '600' }}>Active Cohort Filters</h4>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--muted)' }}>Narrow down student metrics by login/activity date and select target study participants.</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', alignItems: 'center' }}>
+            {/* Login / Active Date Filter */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Login/Activity Date</label>
+              <select 
+                value={selectedDate} 
+                onChange={(e) => {
+                  setSelectedDate(e.target.value);
+                  // Dynamic behavior: When date changes, auto-select all students in that day's cohort
+                  let filteredByDate = [];
+                  if (e.target.value === 'all') {
+                    filteredByDate = students;
+                  } else {
+                    let targetDateStr = e.target.value;
+                    if (e.target.value === 'today') {
+                      targetDateStr = new Date().toISOString().split('T')[0];
+                    } else if (e.target.value === 'tomorrow') {
+                      targetDateStr = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                    }
+                    filteredByDate = students.filter(s => s.active_dates && s.active_dates.includes(targetDateStr));
+                  }
+                  setSelectedStudents(filteredByDate.map(s => s.username));
+                }} 
+                style={{ 
+                  width: '220px', 
+                  padding: '8px 12px', 
+                  borderRadius: '10px', 
+                  fontSize: '0.85rem',
+                  background: 'rgba(0, 0, 0, 0.2)',
+                  color: '#fff',
+                  border: '1px solid var(--border)',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="all">📅 All Activity Dates</option>
+                <option value="today">📅 Active Today</option>
+                <option value="tomorrow">📅 Active Tomorrow (Testing)</option>
+                {uniqueDates.map(date => (
+                  <option key={date} value={date}>📅 {date}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Student Selector Multi-Select Dropdown */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', position: 'relative' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Select Target Students</label>
+              <button 
+                type="button"
+                onClick={() => setShowStudentDropdown(!showStudentDropdown)}
+                className="btn btn-secondary"
+                style={{ 
+                  width: '240px', 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  padding: '8px 12px', 
+                  fontSize: '0.85rem',
+                  borderRadius: '10px',
+                  background: 'rgba(0,0,0,0.2)',
+                  border: '1px solid var(--border)',
+                  color: '#fff',
+                  cursor: 'pointer'
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <i className="fa-solid fa-users" style={{ color: 'var(--primary)' }}></i>
+                  {selectedStudents.length === dateFilteredStudents.length 
+                    ? 'All Cohort Selected' 
+                    : `Selected: ${selectedStudents.length} / ${dateFilteredStudents.length}`}
+                </span>
+                <i className={`fa-solid fa-chevron-${showStudentDropdown ? 'up' : 'down'}`} style={{ fontSize: '0.75rem', opacity: 0.7 }}></i>
+              </button>
+
+              {showStudentDropdown && (
+                <>
+                  {/* Backdrop for closing dropdown on clicking outside */}
+                  <div 
+                    onClick={() => setShowStudentDropdown(false)}
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99, background: 'transparent' }}
+                  />
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: '100%', 
+                    right: 0, 
+                    zIndex: 100, 
+                    width: '280px', 
+                    marginTop: '6px',
+                    padding: '12px',
+                    background: 'rgba(20, 24, 45, 0.98)', 
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(139, 92, 246, 0.3)', 
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px'
+                  }}>
+                    {/* Search box inside dropdown */}
+                    <input 
+                      type="text" 
+                      placeholder="🔍 Search username..." 
+                      value={studentSearch}
+                      onChange={(e) => setStudentSearch(e.target.value)}
+                      style={{ 
+                        padding: '6px 10px', 
+                        fontSize: '0.8rem', 
+                        borderRadius: '6px', 
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: '#fff',
+                        outline: 'none'
+                      }} 
+                    />
+
+                    {/* Quick Select Buttons */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '0 2px' }}>
+                      <button 
+                        type="button"
+                        onClick={() => setSelectedStudents(dateFilteredStudents.map(s => s.username))}
+                        style={{ fontSize: '0.75rem', background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', padding: 0 }}
+                      >
+                        Select All Cohort
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setSelectedStudents([])}
+                        style={{ fontSize: '0.75rem', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: 0 }}
+                      >
+                        Clear All
+                      </button>
+                    </div>
+
+                    {/* List of Student checkboxes */}
+                    <div style={{ 
+                      maxHeight: '180px', 
+                      overflowY: 'auto', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '4px',
+                      paddingTop: '4px'
+                    }}>
+                      {dateFilteredStudents.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '10px 0', fontSize: '0.78rem', color: 'var(--muted)' }}>
+                          No active students found for this date.
+                        </div>
+                      ) : (
+                        dateFilteredStudents
+                          .filter(s => s.username.toLowerCase().includes(studentSearch.toLowerCase()))
+                          .map(s => {
+                            const isChecked = selectedStudents.includes(s.username);
+                            return (
+                              <label 
+                                key={s.username} 
+                                style={{ 
+                                  display: 'flex', 
+                                  alignItems: 'center', 
+                                  gap: '8px', 
+                                  fontSize: '0.8rem', 
+                                  cursor: 'pointer',
+                                  padding: '5px 8px',
+                                  borderRadius: '6px',
+                                  background: isChecked ? 'rgba(139,92,246,0.12)' : 'transparent',
+                                  transition: 'all 0.15s'
+                                }}
+                              >
+                                <input 
+                                  type="checkbox" 
+                                  checked={isChecked}
+                                  onChange={() => {
+                                    if (isChecked) {
+                                      setSelectedStudents(selectedStudents.filter(u => u !== s.username));
+                                    } else {
+                                      setSelectedStudents([...selectedStudents, s.username]);
+                                    }
+                                  }}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                                <span style={{ color: isChecked ? '#fff' : 'var(--muted)' }}>{s.username}</span>
+                              </label>
+                            );
+                          })
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Aggregate Metrics Grid */}
       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '30px' }}>
@@ -455,7 +712,7 @@ export default function MasteryAnalytics() {
               </tr>
             </thead>
             <tbody>
-              {students.map((stu, i) => (
+              {finalFilteredStudents.map((stu, i) => (
                 <tr key={i} style={{ borderBottom: '1px solid var(--border)', transition: 'all 0.15s' }} className="table-row-hover">
                   <td style={{ padding: '14px 8px', fontWeight: '700', color: '#fff' }}>{stu.username}</td>
                   <td style={{ padding: '14px 8px', textAlign: 'center', color: '#38bdf8', fontWeight: '600' }}>{stu.active_hours.toFixed(2)} hrs</td>
