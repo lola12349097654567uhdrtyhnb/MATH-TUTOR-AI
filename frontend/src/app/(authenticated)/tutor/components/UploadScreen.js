@@ -143,6 +143,67 @@ export function UploadScreen({
     submitUpload('', false, true);
   };
 
+  const getTopicTypingInstructions = () => {
+    switch (topic) {
+      case 'fractions':
+        return (
+          <div style={{ padding: '15px', background: 'rgba(56, 189, 248, 0.08)', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: '12px', marginBottom: '15px', fontSize: '0.88rem' }}>
+            <h4 style={{ margin: '0 0 8px', color: '#38bdf8', fontWeight: '700' }}><i className="fa-solid fa-keyboard"></i> Fractions Typing Rules:</h4>
+            <ul style={{ margin: 0, paddingLeft: '18px', color: '#d1d5db', lineHeight: '1.5' }}>
+              <li style={{ marginBottom: '4px' }}><strong>Division / Fraction:</strong> Use the forward slash <code>/</code> (e.g. type <code>3/4</code> for three-quarters).</li>
+              <li style={{ marginBottom: '4px' }}><strong>Multiplication:</strong> Use the asterisk <code>*</code> or lowercase letter <code>x</code> (e.g. type <code>2/3 * 4/5</code> or <code>2/3 x 4/5</code>).</li>
+              <li><strong>Mixed Numbers:</strong> Add a space between the whole number and fraction (e.g. type <code>1 1/2</code> for one and a half).</li>
+            </ul>
+          </div>
+        );
+      case 'algebra':
+        return (
+          <div style={{ padding: '15px', background: 'rgba(167, 139, 250, 0.08)', border: '1px solid rgba(167, 139, 250, 0.2)', borderRadius: '12px', marginBottom: '15px', fontSize: '0.88rem' }}>
+            <h4 style={{ margin: '0 0 8px', color: '#a78bfa', fontWeight: '700' }}><i className="fa-solid fa-keyboard"></i> Algebra Typing Rules:</h4>
+            <ul style={{ margin: 0, paddingLeft: '18px', color: '#d1d5db', lineHeight: '1.5' }}>
+              <li style={{ marginBottom: '4px' }}><strong>Variables:</strong> Use standard lowercase letters like <code>x</code>, <code>y</code>, or <code>a</code>.</li>
+              <li style={{ marginBottom: '4px' }}><strong>Multiplication:</strong> Use the asterisk <code>*</code> or just write them together (e.g. type <code>3 * x</code> or <code>3x</code>).</li>
+              <li><strong>Division:</strong> Use the forward slash <code>/</code> and use parentheses to group terms (e.g. type <code>(x + 2) / 3</code>).</li>
+            </ul>
+          </div>
+        );
+      case 'exponents':
+        return (
+          <div style={{ padding: '15px', background: 'rgba(251, 191, 36, 0.08)', border: '1px solid rgba(251, 191, 36, 0.2)', borderRadius: '12px', marginBottom: '15px', fontSize: '0.88rem' }}>
+            <h4 style={{ margin: '0 0 8px', color: '#fbbf24', fontWeight: '700' }}><i className="fa-solid fa-keyboard"></i> Exponents Typing Rules:</h4>
+            <ul style={{ margin: 0, paddingLeft: '18px', color: '#d1d5db', lineHeight: '1.5' }}>
+              <li style={{ marginBottom: '4px' }}><strong>Powers:</strong> Use the caret symbol <code>^</code> (e.g. type <code>2^3</code> for two to the power of three, or <code>x^2</code> for x squared).</li>
+              <li style={{ marginBottom: '4px' }}><strong>Multiplication:</strong> Use the asterisk <code>*</code> or lowercase letter <code>x</code> (e.g. type <code>2^3 * 2^4</code>).</li>
+              <li><strong>Fractions/Negatives:</strong> Wrap exponents in parentheses if they are fractions or negative numbers (e.g. type <code>x^(-2)</code> or <code>9^(1/2)</code>).</li>
+            </ul>
+          </div>
+        );
+      case 'geometry':
+        return (
+          <div style={{ padding: '15px', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '12px', marginBottom: '15px', fontSize: '0.88rem' }}>
+            <h4 style={{ margin: '0 0 8px', color: '#10b981', fontWeight: '700' }}><i className="fa-solid fa-keyboard"></i> Geometry Typing Rules:</h4>
+            <ul style={{ margin: 0, paddingLeft: '18px', color: '#d1d5db', lineHeight: '1.5' }}>
+              <li style={{ marginBottom: '4px' }}><strong>Multiplication:</strong> Use the asterisk <code>*</code> or lowercase letter <code>x</code> (e.g. type <code>pi * r^2</code> or <code>3.14 x 5 x 5</code>).</li>
+              <li style={{ marginBottom: '4px' }}><strong>Powers (Area/Volume):</strong> Use the caret symbol <code>^</code> (e.g. type <code>r^2</code> or <code>cm^3</code>).</li>
+              <li style={{ marginBottom: '4px' }}><strong>Division:</strong> Use the forward slash <code>/</code> (e.g. type <code>(b * h) / 2</code> for triangle area).</li>
+              <li><strong>Pi (π):</strong> Type <code>pi</code> or <code>PI</code> (e.g. type <code>pi * 5^2</code>).</li>
+            </ul>
+          </div>
+        );
+      default:
+        return (
+          <div style={{ padding: '15px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '15px', fontSize: '0.88rem' }}>
+            <h4 style={{ margin: '0 0 8px', color: 'var(--primary)', fontWeight: '700' }}><i className="fa-solid fa-keyboard"></i> Math Typing Rules:</h4>
+            <ul style={{ margin: 0, paddingLeft: '18px', color: '#d1d5db', lineHeight: '1.5' }}>
+              <li style={{ marginBottom: '4px' }}><strong>Multiplication:</strong> Use asterisk <code>*</code> (e.g. <code>5 * 6</code>).</li>
+              <li style={{ marginBottom: '4px' }}><strong>Division:</strong> Use forward slash <code>/</code> (e.g. <code>12 / 3</code>).</li>
+              <li><strong>Exponents (Powers):</strong> Use caret <code>^</code> (e.g. <code>2^3</code>).</li>
+            </ul>
+          </div>
+        );
+    }
+  };
+
   // Fullscreen Modal rendered via React Portal
   const renderFullscreenModal = () => {
     if (!mounted || !isFullscreen) return null;
@@ -411,6 +472,7 @@ export function UploadScreen({
 
         {uploadMode === 'typed' && (
           <div style={{ marginBottom: '20px', textAlign: 'left' }}>
+            {getTopicTypingInstructions()}
             <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', fontSize: '0.95rem', color: '#9ca3af' }}>Type your step-by-step math calculations:</label>
             <textarea 
               placeholder="Type your steps here... (e.g. 5/6 * (2/3 + 1/4) = 5/6 * 11/12 = 55/72)" 
