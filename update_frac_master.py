@@ -8,7 +8,7 @@ complex_fractions = [
     {"content": "What is the result of (1/2 + 1/3)^2?", "options": ["25/36", "5/36", "25/6", "1/36"], "correct_answer": "25/36"},
     {"content": "Simplify: 1 / (1 + 1/2)", "options": ["2/3", "3/2", "1", "2"], "correct_answer": "2/3"},
     {"content": "Evaluate: (3/4) / (5/8)", "options": ["6/5", "15/32", "5/6", "32/15"], "correct_answer": "6/5"},
-    {"content": "Evaluate: 1/3 * (4/5 - 1/2)", "options": ["1/10", "3/10", "1/5", "3/5"], "correct_answer": "1/10"},
+    {"content": "Evaluate: 1/3 * (4/5 - 1/2)", "options": ["1/10", "3/10", "1/5", "3/5"], "correct_answer": "3/10"},
     {"content": "Evaluate: 7/8 / (1/4 + 1/2)", "options": ["7/6", "6/7", "7/4", "4/7"], "correct_answer": "7/6"},
     {"content": "Evaluate: (2/5 * 5/8) + 1/4", "options": ["1/2", "1/4", "3/4", "3/8"], "correct_answer": "1/2"},
     {"content": "Evaluate: 3/4 - (1/2 * 1/3)", "options": ["7/12", "5/12", "1/4", "2/3"], "correct_answer": "7/12"},
